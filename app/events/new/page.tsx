@@ -4,7 +4,7 @@ export default function NewEvent() {
   return (
     <main className="shell">
       <nav className="nav">
-        <Link className="brand" href="/">Entry<span>Fund</span></Link>
+        <Link className="brand" href="/">Entry<span className="brand-accent">Fund</span></Link>
         <Link className="btn btn-soft" href="/dashboard">Back to dashboard</Link>
       </nav>
 
