@@ -4,7 +4,7 @@ export default function CardPage(){
  return <div className="app">
   <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav">
    <Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link className="active" href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link>
-  </nav></aside>
+  <Link href="/settings">Settings</Link></nav></aside>
   <main className="main">
    <div className="topbar"><div><div className="muted small">Organizer spending</div><h1>Virtual card</h1></div><Link className="btn btn-soft" href="/dashboard">Back to overview</Link></div>
    <div className="dashboard-grid">
