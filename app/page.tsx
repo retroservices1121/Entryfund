@@ -7,7 +7,7 @@ export default function Home(){
   <section className="hero-dark">
    <div className="shell">
     <nav className="nav landing-nav">
-     <Link className="brand brand-light" href="/">Entry<span>Fund</span></Link>
+     <Link className="brand brand-light" href="/">Entry<span className="brand-accent">Fund</span></Link>
      <div className="navlinks navlinks-light">
       <a href="#product">Product</a><a href="#money">Money flow</a><a href="#sports">Sports</a>
       <Link className="btn btn-glass" href="/dashboard">Organizer login</Link>
@@ -103,6 +103,6 @@ export default function Home(){
    </div>
   </section>
 
-  <footer className="site-footer"><div className="shell row"><div className="brand brand-light">Entry<span>Fund</span></div><div className="small">Financial infrastructure for sports organizers.</div><div className="small">© 2026 EntryFund</div></div></footer>
+  <footer className="site-footer"><div className="shell row"><div className="brand brand-light">Entry<span className="brand-accent">Fund</span></div><div className="small">Financial infrastructure for sports organizers.</div><div className="small">© 2026 EntryFund</div></div></footer>
  </main>
 }
