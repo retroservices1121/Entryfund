@@ -14,8 +14,8 @@ export default function PayoutsPage() {
         <nav className="sidenav">
           <Link href="/dashboard">Overview</Link>
           <Link href="/events/new">Collections</Link>
-          <a href="#">Card</a>
-          <a href="#">Transactions</a>
+          <Link href="/card">Card</Link>
+          <Link href="/transactions">Transactions</Link>
           <Link className="active" href="/payouts">Winner payouts</Link>
           <a href="#">Refunds</a>
           <a href="#">Withdrawals</a>
