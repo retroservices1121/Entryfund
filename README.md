@@ -6,7 +6,7 @@ EntryFund is not sports-management software. It does not manage brackets, scorin
 
 The product financial loop is:
 
-**Collect registrations → manage event revenue → spend from the same balance → withdraw profit**
+**Collect registrations → manage event revenue → spend from the same balance → pay winners → withdraw profit**
 
 ## V1 surfaces
 
@@ -15,6 +15,11 @@ The product financial loop is:
 - Public registration page
 - Balance and virtual-card experience
 - Transaction activity
+- Event financial detail / event P&L
+- Winner payout ledger
+- Refund tracking
+- Withdrawal history
+- Virtual-card management surface
 - Whop integration boundary
 - Whop webhook endpoint scaffold
 
@@ -55,6 +60,7 @@ Do not commit live financial credentials.
 4. Payment webhook reconciliation
 5. Balance retrieval
 6. Virtual card issuance and controls
-7. Refund flow
-8. Withdrawal flow and pricing
-9. Event-level financial ledger and P&L
+7. Live winner payout execution and payout-status reconciliation
+8. Refund execution
+9. Withdrawal execution and pricing
+10. Persistent event-level financial ledger and P&L
