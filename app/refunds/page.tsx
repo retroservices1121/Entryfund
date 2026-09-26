@@ -8,7 +8,7 @@ const refunds=[
 export default function RefundsPage(){
  return <div className="app">
   <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav">
-   <Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><a href="#">Card</a><a href="#">Transactions</a><Link href="/payouts">Winner payouts</Link><Link className="active" href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link>
+   <Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link className="active" href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link>
   </nav></aside>
   <main className="main">
    <div className="topbar"><div><div className="muted small">Financial operations</div><h1>Refunds</h1></div><Link className="btn btn-soft" href="/dashboard">Back to overview</Link></div>
