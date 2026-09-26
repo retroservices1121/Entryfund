@@ -5,3 +5,11 @@
 
 @media(max-width:1000px){.hero-pro{grid-template-columns:1fr}.hero-copy h1{font-size:62px}.sport-photo{height:470px}.flow-grid{grid-template-columns:1fr 1fr}.money-layout,.split-heading,.final-inner{grid-template-columns:1fr;gap:35px}.sports-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:620px){.hero-pro{padding:52px 0 60px}.hero-copy h1{font-size:48px}.hero-copy p{font-size:17px}.sport-photo{height:430px}.float-balance{left:12px;bottom:12px;width:210px}.float-card{right:12px;bottom:118px;width:190px;height:120px}.flow-grid,.sports-grid{grid-template-columns:1fr}.split-heading h2,.money-layout h2,.final-inner h2{font-size:38px}.trustline{gap:10px}.landing-nav .navlinks a:not(.btn-lime){display:none}.ledger-demo{padding:18px}.ticker-track{animation:none;flex-wrap:wrap;width:auto}.ticker-track span:nth-child(n+9){display:none}}
+
+/* Whop-issued card presentation: EntryFund is the program/card label, not issuer artwork. */
+.whop-mark{display:inline-flex;align-items:center;justify-content:center;font-style:italic;font-weight:950;letter-spacing:-.18em;font-size:20px}
+.virtual-card{background:linear-gradient(145deg,#f8f8f6,#e9eae6);color:#555;border:1px solid #cfd2ce;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
+.virtual-card .digits{color:#656a66}
+.virtual-card small{font-size:9px;font-weight:500}
+.float-card{background:#f7f8f5;color:#555;border:1px solid #d6d9d4;transform:rotate(2deg)}
+.mini-card-top small{font-size:8px;font-weight:500;letter-spacing:0}
