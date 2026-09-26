@@ -11,7 +11,7 @@ export default function Home(){
      <div className="navlinks navlinks-light">
       <a href="#product">Product</a><a href="#money">Money flow</a><a href="#sports">Sports</a>
       <Link className="btn btn-glass" href="/dashboard">Organizer login</Link>
-      <Link className="btn btn-lime" href="/events/new">Start collecting</Link>
+      <Link className="btn btn-lime" href="/onboarding">Start collecting</Link>
      </div>
     </nav>
 
@@ -21,7 +21,7 @@ export default function Home(){
       <h1>From entry fee<br/>to <em>game money.</em></h1>
       <p>EntryFund gives leagues and tournament organizers one financial home to collect registrations, spend event revenue, track payouts, and withdraw profit.</p>
       <div className="actions">
-       <Link className="btn btn-lime btn-xl" href="/events/new">Create your first collection →</Link>
+       <Link className="btn btn-lime btn-xl" href="/onboarding">Create your first collection →</Link>
        <Link className="btn btn-glass btn-xl" href="/dashboard">Explore the product</Link>
       </div>
       <div className="trustline"><span>NO BRACKETS</span><span>NO SCHEDULING</span><span>NO TEAM CHAT</span><strong>JUST THE MONEY.</strong></div>
@@ -99,7 +99,7 @@ export default function Home(){
   <section className="final-cta">
    <div className="shell final-inner">
     <div><div className="section-kicker lime-text">MONEY MOVES. KEEP UP.</div><h2>They run the sport.<br/><em>We run the money.</em></h2></div>
-    <div><p>Build your first collection and see what event finance looks like when it was designed for organizers from day one.</p><Link className="btn btn-lime btn-xl" href="/events/new">Start with EntryFund →</Link></div>
+    <div><p>Build your first collection and see what event finance looks like when it was designed for organizers from day one.</p><Link className="btn btn-lime btn-xl" href="/onboarding">Start with EntryFund →</Link></div>
    </div>
   </section>
 
