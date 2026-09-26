@@ -27,8 +27,8 @@ export default function EventFinancePage(){
    <nav className="sidenav">
     <Link href="/dashboard">Overview</Link>
     <Link href="/events/new">Collections</Link>
-    <a href="#">Card</a>
-    <a href="#">Transactions</a>
+    <Link href="/card">Card</Link>
+    <Link href="/transactions">Transactions</Link>
     <Link href="/payouts">Winner payouts</Link>
     <Link href="/refunds">Refunds</Link>
     <Link href="/withdrawals">Withdrawals</Link>
