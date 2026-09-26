@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function OnboardingPage(){
  return <main className="shell">
-  <nav className="nav"><Link className="brand" href="/">Entry<span>Fund</span></Link><Link className="btn btn-soft" href="/dashboard">Demo dashboard</Link></nav>
+  <nav className="nav"><Link className="brand" href="/">Entry<span className="brand-accent">Fund</span></Link><Link className="btn btn-soft" href="/dashboard">Demo dashboard</Link></nav>
   <div className="form-wrap">
    <div className="signal" style={{color:"#2563eb"}}><span className="signal-dot"/> ORGANIZER ACCOUNT</div>
    <h1 style={{fontSize:44,letterSpacing:"-.05em",margin:"14px 0"}}>Set up your financial workspace.</h1>
