@@ -2,36 +2,61 @@
 
 **Financial infrastructure for sports organizers.**
 
-EntryFund is not sports-management software. It does not manage brackets, scoring, scheduling, standings, or team chat.
+> They run the sport. We run the money.
+
+EntryFund is a sports-fintech product for leagues, tournament directors, clubs and independent organizers. It deliberately does **not** manage brackets, scoring, schedules, standings or team chat.
 
 The product financial loop is:
 
-**Collect registrations → manage event revenue → spend from the same balance → pay winners → withdraw profit**
+**Collect registrations → manage event revenue → spend from the same balance → track competitive payouts → withdraw profit**
 
-## V1 surfaces
+## Current V1
 
-- Organizer dashboard
-- Create registration/collection
-- Public registration page
-- Balance and virtual-card experience
-- Transaction activity
-- Event financial detail / event P&L
-- Winner payout ledger
+- High-impact sports + fintech landing experience
+- Organizer onboarding and verification state UX
+- Create registration / financial collection
+- Public player registration page
+- Organizer financial dashboard
+- Collection/event financial detail and P&L
+- Virtual-card workspace
+- Unified transaction ledger
+- Competitive award / payout ledger
 - Refund tracking
 - Withdrawal history
-- Virtual-card management surface
-- Whop integration boundary
+- Organizer settings
+- Shared financial domain model and ledger calculations
+- Whop provider integration boundary
 - Whop webhook endpoint scaffold
+- Health endpoint and environment template
 
-## Product architecture
+## Architecture
 
-- **Organizer** = financial connected account / verification subject
-- **Collection/Event** = EntryFund accounting object
-- **Player** = payer; does not need an EntryFund account
-- **Virtual card** = organizer spending instrument
-- **Whop** = payments, balance, connected-account/KYC, card issuing, payouts infrastructure
+- **Organizer** = financial connected account and KYC/KYB subject
+- **Collection/Event** = EntryFund accounting object; it is not a separate KYC identity
+- **Participant** = payer; does not need an EntryFund organizer account
+- **Registration** = revenue tied to a collection
+- **Expense** = organizer card spend attributed to a collection
+- **Award** = organizer-entered competitive payout obligation; EntryFund does not determine winners
+- **Refund** = money returned against an original registration
+- **Withdrawal** = organizer transfer of available funds out of EntryFund
+- **Whop** = intended payments, connected-account verification, balance, virtual-card and payout infrastructure
 
-Events do **not** create separate KYC identities. One verified organizer may create many collections.
+## Routes
+
+- `/` landing
+- `/onboarding` organizer setup
+- `/dashboard` financial overview
+- `/events/new` create collection
+- `/events/[slug]` public registration
+- `/dashboard/events/[slug]` collection finances
+- `/card` virtual card
+- `/transactions` ledger
+- `/payouts` competitive awards
+- `/refunds` refund tracking
+- `/withdrawals` external withdrawals
+- `/settings` organizer verification/settings
+- `/api/whop/webhooks` provider webhook scaffold
+- `/api/health` health check
 
 ## Local development
 
@@ -40,27 +65,23 @@ npm install
 npm run dev
 ```
 
-Open `http://localhost:3000`.
+Copy `.env.example` to `.env.local` and add credentials locally. Never commit live financial credentials.
 
-## Environment variables planned
+## Remaining production integrations
 
-```
-WHOP_API_KEY=
-WHOP_WEBHOOK_SECRET=
-NEXT_PUBLIC_APP_URL=
-```
+The UI and domain boundaries are intentionally provider-ready, but live money movement must not be simulated.
 
-Do not commit live financial credentials.
+1. Choose/connect production database and authentication
+2. Wire Whop connected-account creation and verification status
+3. Wire live embedded checkout / registration payment creation
+4. Verify Whop webhook signatures and persist payment events idempotently
+5. Retrieve real organizer balances
+6. Issue/manage real virtual cards
+7. Execute and reconcile refunds
+8. Execute approved competitive payouts and track status
+9. Execute withdrawals and apply the final pricing policy
+10. Add audit log, permissions, dispute/chargeback handling, observability and production tests
 
-## Next integration work
+## Product boundary
 
-1. Organizer authentication and persistent database
-2. Connected-account creation / verification state
-3. Live Whop checkout creation
-4. Payment webhook reconciliation
-5. Balance retrieval
-6. Virtual card issuance and controls
-7. Live winner payout execution and payout-status reconciliation
-8. Refund execution
-9. Withdrawal execution and pricing
-10. Persistent event-level financial ledger and P&L
+EntryFund is **financial software for sports**, not sports-management software.
