@@ -13,8 +13,9 @@ export default function Dashboard() {
           <Link href="/events/new">Collections</Link>
           <a href="#">Card</a>
           <a href="#">Transactions</a>
-          <a href="#">Refunds</a>
-          <a href="#">Withdrawals</a>
+          <Link href="/payouts">Winner payouts</Link>
+          <Link href="/refunds">Refunds</Link>
+          <Link href="/withdrawals">Withdrawals</Link>
         </nav>
       </aside>
 
@@ -35,7 +36,7 @@ export default function Dashboard() {
           <section className="table-card">
             <div className="card-head"><strong>Collections</strong><Link className="small" href="/events/new">New collection</Link></div>
             {events.map((event) => (
-              <Link className="table-row" href={"/events/" + event.slug} key={event.slug}>
+              <Link className="table-row" href={"/dashboard/events/" + event.slug} key={event.slug}>
                 <div><strong>{event.name}</strong><div className="muted small">{event.date}</div></div>
                 <div><strong>{event.paid}/{event.capacity}</strong><div className="muted small">paid</div></div>
                 <div><strong>{money(event.collected)}</strong><div className="muted small">collected</div></div>
