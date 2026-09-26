@@ -11,7 +11,7 @@ export default function CardPage(){
     <section className="card-box">
      <div className="card-head"><strong>Whop Visa</strong><span className="pill">Active</span></div>
      <div className="virtual-card">
-      <div className="row"><strong className="whop-mark">W</strong><span>VISA <small>Platinum</small></span></div>
+      <div className="row"><img className="whop-logo" src="/whop-mark.svg" alt="Whop"/><span>VISA <small>Platinum</small></span></div>
       <div><div className="digits">•••• •••• •••• 1847</div><div className="row small" style={{marginTop:12}}><span>EntryFund</span><span>•••• 1847</span></div></div>
      </div>
     </section>
