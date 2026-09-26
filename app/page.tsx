@@ -36,7 +36,7 @@ export default function Home(){
         <div className="float-meta"><span>184 paid</span><span>92% capacity</span></div>
        </div>
        <div className="float-card">
-        <div className="mini-card-top"><b>ENTRYFUND</b><span>VISA</span></div>
+        <div className="mini-card-top"><b>WHOP</b><span>VISA</span></div>
         <div className="mini-card-number">•••• 1847</div>
         <div className="mini-card-bottom"><span>EVENT OPERATIONS</span><b>$9,355</b></div>
        </div>
@@ -55,7 +55,7 @@ export default function Home(){
     <div className="flow-grid">
      <article className="flow-card flow-black"><div className="flow-num">01</div><div><div className="flow-icon">↙</div><h3>Collect</h3><p>Create a registration collection. Share the link or QR. Players pay without needing an EntryFund account.</p></div><div className="micro-ui"><span>128 / 128 PAID</span><strong>$6,400</strong></div></article>
      <article className="flow-card"><div className="flow-num">02</div><div><div className="flow-icon">◎</div><h3>Manage</h3><p>Every dollar already knows which collection it belongs to. Track revenue, refunds, expenses and available funds.</p></div><div className="micro-bars"><i/><i/><i/></div></article>
-     <article className="flow-card flow-lime"><div className="flow-num">03</div><div><div className="flow-icon">↗</div><h3>Spend</h3><p>Use the organizer virtual card for event expenses instead of moving money to another bank first.</p></div><div className="micro-card">ENTRYFUND <span>•••• 1847</span></div></article>
+     <article className="flow-card flow-lime"><div className="flow-num">03</div><div><div className="flow-icon">↗</div><h3>Spend</h3><p>Use the organizer virtual card for event expenses instead of moving money to another bank first.</p></div><div className="micro-card">WHOP <span>•••• 1847</span></div></article>
      <article className="flow-card"><div className="flow-num">04</div><div><div className="flow-icon">🏆</div><h3>Settle</h3><p>Track competitive prize payouts, reconcile the event, then withdraw the organizer's remaining profit.</p></div><div className="micro-ui"><span>EVENT NET</span><strong>$2,311</strong></div></article>
     </div>
    </div>
