@@ -17,9 +17,9 @@ export default function PayoutsPage() {
           <Link href="/card">Card</Link>
           <Link href="/transactions">Transactions</Link>
           <Link className="active" href="/payouts">Winner payouts</Link>
-          <a href="#">Refunds</a>
-          <a href="#">Withdrawals</a>
-        </nav>
+          <Link href="/refunds">Refunds</Link>
+          <Link href="/withdrawals">Withdrawals</Link>
+        <Link href="/settings">Settings</Link></nav>
       </aside>
       <main className="main">
         <div className="topbar">
