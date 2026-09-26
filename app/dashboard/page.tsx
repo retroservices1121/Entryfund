@@ -46,7 +46,7 @@ export default function Dashboard() {
           </section>
 
           <section className="card-box">
-            <div className="card-head"><strong>EntryFund Card</strong><span className="pill">Active</span></div>
+            <div className="card-head"><strong>Whop Card</strong><span className="pill">Active</span></div>
             <div className="virtual-card">
               <div className="row"><strong>EntryFund</strong><span>VISA</span></div>
               <div>
