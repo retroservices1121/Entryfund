@@ -16,7 +16,7 @@ export default function Dashboard() {
           <Link href="/payouts">Winner payouts</Link>
           <Link href="/refunds">Refunds</Link>
           <Link href="/withdrawals">Withdrawals</Link>
-        </nav>
+        <Link href="/settings">Settings</Link></nav>
       </aside>
 
       <main className="main">
