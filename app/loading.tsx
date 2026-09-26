@@ -1,0 +1,1 @@
+export default function Loading(){return <main className="shell" style={{paddingTop:80}}><div className="form-card"><strong>Loading EntryFund…</strong><p className="muted small">Preparing your financial workspace.</p></div></main>}
