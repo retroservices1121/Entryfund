@@ -48,6 +48,7 @@ CREATE TABLE IF NOT EXISTS registrations (
  amount_cents bigint NOT NULL CHECK(amount_cents>0),
  status text NOT NULL CHECK(status IN ('pending','available','completed','failed','refunded')),
  provider_payment_id text UNIQUE,
+ provider_checkout_id text UNIQUE,
  created_at timestamptz NOT NULL DEFAULT now()
 );
 
@@ -122,3 +123,5 @@ CREATE INDEX IF NOT EXISTS expenses_organizer_idx ON expenses(organizer_id);
 CREATE INDEX IF NOT EXISTS expenses_collection_idx ON expenses(collection_id);
 CREATE INDEX IF NOT EXISTS awards_collection_idx ON awards(collection_id);
 CREATE INDEX IF NOT EXISTS audit_organizer_created_idx ON audit_log(organizer_id,created_at DESC);
+
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS provider_checkout_id text UNIQUE;
