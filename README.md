@@ -45,6 +45,7 @@ The product financial loop is:
 
 - `/` landing
 - `/onboarding` organizer setup
+- `/login` organizer sign-in
 - `/dashboard` financial overview
 - `/events/new` create collection
 - `/events/[slug]` public registration
@@ -75,16 +76,15 @@ startup behavior, the pinned Whop SDK contract, and remaining production limits.
 
 The UI and domain boundaries are intentionally provider-ready, but live money movement must not be simulated.
 
-1. Choose/connect production database and authentication
-2. Wire Whop connected-account creation and verification status
-3. Wire live embedded checkout / registration payment creation
-4. Verify Whop webhook signatures and persist payment events idempotently
-5. Retrieve real organizer balances
-6. Issue/manage real virtual cards
-7. Execute and reconcile refunds
-8. Execute approved competitive payouts and track status
-9. Execute withdrawals and apply the final pricing policy
-10. Add audit log, permissions, dispute/chargeback handling, observability and production tests
+1. Validate invitations and account sign-in against the deployed PostgreSQL database
+2. Run a complete Whop sandbox checkout and webhook test
+3. Confirm connected-account verification status in the organizer workspace
+4. Retrieve real organizer balances and replace demonstration finance screens
+5. Issue/manage real virtual cards
+6. Execute and reconcile full and partial refunds
+7. Execute approved competitive payouts and track status
+8. Execute withdrawals and apply the final pricing policy
+9. Add dispute/chargeback handling, observability and production tests
 
 ## Product boundary
 

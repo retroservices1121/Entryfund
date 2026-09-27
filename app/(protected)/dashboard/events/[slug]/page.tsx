@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePageSession } from "@/lib/auth";
 
 const money=(n:number)=>n.toLocaleString("en-US",{style:"currency",currency:"USD"});
 
@@ -15,7 +16,8 @@ const expenses=[
  {name:"Hotel",amount:486.24},
 ];
 
-export default function EventFinancePage(){
+export default async function EventFinancePage(){
+ await requirePageSession();
  const collected=6400;
  const refunded=50;
  const spent=expenses.reduce((s,e)=>s+e.amount,0);

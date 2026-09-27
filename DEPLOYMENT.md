@@ -23,6 +23,7 @@ Remove dashboard build/start overrides if they conflict with this configuration.
 | `WHOP_COMPANY_ID` | The platform account ID (`biz_...`). The key determines the parent of newly created connected accounts. |
 | `WHOP_WEBHOOK_SECRET` | Exact endpoint signing secret, including its `ws_` prefix. |
 | `WHOP_SANDBOX` | `true` for sandbox keys and webhooks; `false` for production. |
+| `AUTH_SECRET` | A random invitation code of at least 32 characters. Required to create or claim organizer accounts. Keep it server-side and give it only to invited organizers. |
 
 No credentials are needed to compile. Without `DATABASE_URL`, the migration logs
 that it was skipped and the existing UI can start. Database-backed operations
@@ -33,8 +34,28 @@ settings. For external databases, use the provider's documented TLS configuratio
 the application no longer disables certificate checks or forces TLS by hostname.
 
 `/api/health` is the Railway process healthcheck. `/api/ready` separately checks
-database connectivity and the presence of Whop settings; it does not validate
+database connectivity and the presence of Whop and invitation settings; it does not validate
 credentials against Whop. A successful healthcheck is not proof of payment readiness.
+
+## Organizer access
+
+Invited organizers use `/onboarding` with their work email, a password of at least
+12 characters, and `AUTH_SECRET` as the invitation code. An existing organizer
+record with that email can be claimed only by someone holding the invitation code;
+already claimed accounts must sign in at `/login`. Give the code only to trusted
+people. Rotate it after invitations if necessary; existing passwords and sessions
+will continue to work. Set it before deployment; otherwise onboarding is disabled
+and `/api/ready` reports authentication as unavailable.
+
+Passwords are salted and hashed with scrypt. Sessions are stored in Postgres and
+sent to browsers in HTTP-only, SameSite cookies that require HTTPS in production.
+The session is valid for seven days and can be revoked with Sign out. Login attempts
+are limited per email. Organizer pages and APIs resolve the organizer from the
+server-side session. Public registration pages and payment webhooks remain public.
+
+Existing organizer records without a password require an invitation code to claim.
+The migration adds password hashes, sessions, and login attempts without deleting
+existing organizers or collections.
 
 ## Whop contract
 
@@ -70,12 +91,13 @@ the compatibility check for this project.
 
 ## Scope and remaining limits
 
-This pass stabilizes installation, compilation, SDK requests, webhook handling,
-and deployment configuration. It does not implement production authentication or
-replace the remaining demonstration finance screens. Organizer routes currently
-trust caller-provided identifiers; live-money launch still requires authentication
-and authorization work. Partial refund accounting remains limited by the existing
-registration-level refunded status. No new product features are included here.
+The first stabilization commit covered installation, SDK requests, webhook handling,
+and deployment configuration. The following access-control pass added invited
+sign-up, sign-in, sessions, and organizer ownership checks. Identity is based on
+the invitation code rather than email verification; use it only for trusted
+invitees. The remaining demonstration finance screens have not been replaced.
+Partial refund accounting remains limited by the existing registration-level
+refunded status. Reconcile these flows before live money movement.
 
 Local tests stub Whop HTTP responses and database connections; they do not prove
 live credentials, Railway connectivity, or Whop account permissions. Validate those

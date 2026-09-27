@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { requirePageSession } from "@/lib/auth";
 
 const awards = [
   { recipient: "John Smith", reason: "1st Place", amount: "$2,000.00", status: "Ready for payout" },
@@ -6,7 +7,8 @@ const awards = [
   { recipient: "Sarah Lee", reason: "3rd Place", amount: "$500.00", status: "Ready for payout" },
 ];
 
-export default function PayoutsPage() {
+export default async function PayoutsPage() {
+ await requirePageSession();
   return (
     <div className="app">
       <aside className="sidebar">

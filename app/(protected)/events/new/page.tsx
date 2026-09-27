@@ -1,0 +1,4 @@
+import Link from "next/link";
+import CollectionForm from "./CollectionForm";
+import { requirePageSession } from "@/lib/auth";
+export default async function NewEvent(){await requirePageSession();return <main className="shell"><nav className="nav"><Link className="brand" href="/">Entry<span className="brand-accent">Fund</span></Link><Link className="btn btn-soft" href="/dashboard">Back to dashboard</Link></nav><div className="form-wrap"><div style={{marginBottom:20}}><div className="eyebrow">New collection</div><h1 style={{fontSize:38,letterSpacing:"-.04em",margin:"8px 0"}}>What are you collecting money for?</h1><p className="muted">Create the financial collection first. EntryFund does not manage brackets, scoring, or scheduling.</p></div><CollectionForm/></div></main>}

@@ -1,18 +1,17 @@
 "use client";
-import { useEffect,useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function CollectionForm(){
- const router=useRouter();const [organizerId,setOrganizerId]=useState("");const [error,setError]=useState("");const [busy,setBusy]=useState(false);
- useEffect(()=>{setOrganizerId(localStorage.getItem("entryfund_organizer_id")||"")},[]);
+ const router=useRouter();const [error,setError]=useState("");const [busy,setBusy]=useState(false);
  async function submit(e:React.FormEvent<HTMLFormElement>){
-  e.preventDefault();if(!organizerId){setError("Create your organizer account first.");return}
+  e.preventDefault();
   setBusy(true);setError("");const data=new FormData(e.currentTarget);
   const dollars=Number(data.get("fee"));const capacity=Number(data.get("capacity"));
-  const res=await fetch("/api/collections",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({organizerId,name:data.get("name"),type:data.get("type"),eventDate:data.get("date"),entryFeeCents:Math.round(dollars*100),capacity})});
+  const res=await fetch("/api/collections",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({name:data.get("name"),type:data.get("type"),eventDate:data.get("date"),entryFeeCents:Math.round(dollars*100),capacity})});
   const json=await res.json();setBusy(false);
   if(!res.ok){setError(json.error||"Unable to create collection");return}
-  router.push("/dashboard?organizer="+encodeURIComponent(organizerId));
+  router.push("/dashboard");
  }
  return <form className="form-card" onSubmit={submit}>
   <div className="field"><label>Collection name</label><input name="name" required placeholder="Virginia Beach Cornhole Open"/></div>

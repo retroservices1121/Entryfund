@@ -14,7 +14,25 @@ CREATE TABLE IF NOT EXISTS organizers (
 CREATE TABLE IF NOT EXISTS users (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  email text NOT NULL UNIQUE,
+ password_hash text,
  created_at timestamptz NOT NULL DEFAULT now()
+);
+
+ALTER TABLE users ADD COLUMN IF NOT EXISTS password_hash text;
+
+CREATE TABLE IF NOT EXISTS sessions (
+ token_hash text PRIMARY KEY,
+ user_id uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+ organizer_id uuid NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
+ expires_at timestamptz NOT NULL,
+ created_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS sessions_user_idx ON sessions(user_id);
+
+CREATE TABLE IF NOT EXISTS login_attempts (
+ email text PRIMARY KEY,
+ attempts integer NOT NULL,
+ reset_at timestamptz NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS memberships (

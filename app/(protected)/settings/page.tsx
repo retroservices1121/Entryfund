@@ -1,6 +1,8 @@
 import Link from "next/link";
+import { requirePageSession } from "@/lib/auth";
 
-export default function SettingsPage(){
+export default async function SettingsPage(){
+ await requirePageSession();
  return <div className="app">
   <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav"><Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link><Link className="active" href="/settings">Settings</Link></nav></aside>
   <main className="main">

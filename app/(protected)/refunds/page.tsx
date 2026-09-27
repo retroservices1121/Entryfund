@@ -1,11 +1,13 @@
 import Link from "next/link";
+import { requirePageSession } from "@/lib/auth";
 
 const refunds=[
  {player:"Morgan Davis",event:"Virginia Beach Open",amount:"$50.00",status:"Completed"},
  {player:"Chris Allen",event:"Fall League",amount:"$50.00",status:"Pending"},
 ];
 
-export default function RefundsPage(){
+export default async function RefundsPage(){
+ await requirePageSession();
  return <div className="app">
   <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav">
    <Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link className="active" href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link>
