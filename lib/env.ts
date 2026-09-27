@@ -13,7 +13,7 @@ export const env={
 
 export function assertFinancialConfig(){
  return {
-  apiKey:required("WHOP_COMPANY_API_KEY"),
+  apiKey:env.whopApiKey??required("WHOP_COMPANY_API_KEY"),
   webhookSecret:required("WHOP_WEBHOOK_SECRET"),
   companyId:required("WHOP_COMPANY_ID"),
  };

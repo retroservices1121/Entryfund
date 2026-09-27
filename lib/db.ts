@@ -10,7 +10,6 @@ export function db(){
   max:10,
   idleTimeoutMillis:30_000,
   connectionTimeoutMillis:5_000,
-  ssl:env.databaseUrl.includes("localhost")?false:{rejectUnauthorized:false},
  });
  return globalForDb.entryfundPool;
 }

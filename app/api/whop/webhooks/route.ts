@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import { Webhook } from "standardwebhooks";
+import { unwrapWebhook } from "@whop/sdk/helpers";
+import { z } from "zod";
 import { env } from "@/lib/env";
 import { transaction } from "@/lib/db";
 
-type WhopEvent={
- id:string;
- type:string;
- data:Record<string,unknown>;
-};
+const eventSchema=z.object({
+ id:z.string().min(1),
+ type:z.string().min(1),
+ data:z.record(z.string(),z.unknown()),
+});
 
 function metadataOf(data:Record<string,unknown>){
  const value=data.metadata;
@@ -24,14 +25,16 @@ export async function POST(request:Request){
  const raw=await request.text();
  const headers=Object.fromEntries(request.headers.entries());
 
- let event:WhopEvent;
+ let verified:unknown;
  try{
-  const verifier=new Webhook(env.whopWebhookSecret,{format:"raw"});
-  event=verifier.verify(raw,headers) as WhopEvent;
- }catch(error){
-  console.error("whop_webhook_signature_failed",error);
+  verified=unwrapWebhook(raw,{headers,key:env.whopWebhookSecret});
+ }catch{
   return NextResponse.json({error:"bad signature"},{status:401});
  }
+
+ const parsed=eventSchema.safeParse(verified);
+ if(!parsed.success)return NextResponse.json({error:"invalid webhook payload"},{status:400});
+ const event=parsed.data;
 
  const deliveryId=headers["webhook-id"]??event.id;
  if(!deliveryId){
@@ -66,7 +69,7 @@ export async function POST(request:Request){
         SET status='completed',
             provider_payment_id=COALESCE(provider_payment_id,$1)
         WHERE id=$2
-          AND status IN ('pending','available')`,
+          AND status IN ('pending','available','failed')`,
        [paymentId,registrationId]
       );
      }else{
@@ -88,7 +91,7 @@ export async function POST(request:Request){
       ?event.data.status
       :null;
 
-    if(paymentId&&status==="completed"){
+    if(paymentId&&status==="succeeded"){
      await client.query(
       "UPDATE registrations SET status='refunded' WHERE provider_payment_id=$1",
       [paymentId]

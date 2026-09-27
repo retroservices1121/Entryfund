@@ -61,11 +61,15 @@ The product financial loop is:
 ## Local development
 
 ```bash
-npm install
+npm ci
+npm run check
 npm run dev
 ```
 
 Copy `.env.example` to `.env.local` and add credentials locally. Never commit live financial credentials.
+
+See [deployment configuration and validation](DEPLOYMENT.md) for Railway variables,
+startup behavior, the pinned Whop SDK contract, and remaining production limits.
 
 ## Remaining production integrations
 
