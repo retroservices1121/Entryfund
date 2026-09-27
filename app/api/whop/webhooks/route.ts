@@ -1,33 +1,74 @@
-import { createHmac, timingSafeEqual } from "crypto";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { whop } from "@/lib/whop";
 import { env } from "@/lib/env";
+import { transaction } from "@/lib/db";
 
-function verify(raw:string,signature:string|null){
- const secret=env.whopWebhookSecret;
- if(!secret||!signature)return false;
- const expected=createHmac("sha256",secret).update(raw).digest("hex");
- const supplied=signature.replace(/^sha256=/,"");
- if(expected.length!==supplied.length)return false;
- return timingSafeEqual(Buffer.from(expected),Buffer.from(supplied));
+type WhopEvent={id:string;type:string;data:Record<string,unknown>};
+
+function metadataOf(data:Record<string,unknown>){
+ const value=data.metadata;
+ return value&&typeof value==="object"?value as Record<string,unknown>:{};
 }
 
-export async function POST(request:NextRequest){
- const raw=await request.text();
- const signature=request.headers.get("whop-signature")??request.headers.get("x-whop-signature");
+export async function POST(request:Request){
+ if(!env.whopWebhookSecret)return NextResponse.json({error:"Webhook secret is not configured"},{status:500});
 
- if(!verify(raw,signature)){
-  return NextResponse.json({error:"Invalid webhook signature"},{status:401});
+ const raw=await request.text();
+ const headers=Object.fromEntries(request.headers.entries());
+
+ let event:WhopEvent;
+ try{
+  event=whop().webhooks.unwrap(raw,{headers}) as unknown as WhopEvent;
+ }catch(error){
+  console.error("whop_webhook_signature_failed",error);
+  return NextResponse.json({error:"bad signature"},{status:401});
  }
 
- let payload:unknown;
- try{payload=JSON.parse(raw)}catch{return NextResponse.json({error:"Invalid JSON"},{status:400})}
+ const deliveryId=headers["webhook-id"]??event.id;
+ try{
+  const outcome=await transaction(async client=>{
+   const inserted=await client.query(
+    `INSERT INTO webhook_events(id,provider,event_type,payload)
+     VALUES($1,'whop',$2,$3::jsonb)
+     ON CONFLICT(id) DO NOTHING RETURNING id`,
+    [deliveryId,event.type,raw]
+   );
+   if(inserted.rowCount===0)return "duplicate";
 
- // Production processing contract:
- // 1. persist provider event ID in webhook_events (unique PK)
- // 2. return success immediately for already-seen events
- // 3. reconcile payment/card/refund/payout/withdrawal state transactionally
- // 4. mark processed_at only after successful reconciliation
- console.info(JSON.stringify({kind:"entryfund.whop_webhook",received:true}));
+   if(event.type==="payment.succeeded"||event.type==="payment.failed"){
+    const metadata=metadataOf(event.data);
+    const registrationId=typeof metadata.registration_id==="string"?metadata.registration_id:null;
+    const kind=metadata.kind;
+    if(kind==="entryfund_registration"&&registrationId){
+     const paymentId=typeof event.data.id==="string"?event.data.id:null;
+     if(event.type==="payment.succeeded"){
+      await client.query(
+       `UPDATE registrations
+        SET status='completed',provider_payment_id=COALESCE(provider_payment_id,$1)
+        WHERE id=$2 AND status IN ('pending','available')`,
+       [paymentId,registrationId]
+      );
+     }else{
+      await client.query("UPDATE registrations SET status='failed' WHERE id=$1 AND status='pending'",[registrationId]);
+     }
+    }
+   }
 
- return NextResponse.json({received:true});
+   if(event.type==="refund.created"||event.type==="refund.updated"){
+    const paymentId=typeof event.data.payment_id==="string"?event.data.payment_id:null;
+    const status=typeof event.data.status==="string"?event.data.status:null;
+    if(paymentId&&status==="completed"){
+     await client.query("UPDATE registrations SET status='refunded' WHERE provider_payment_id=$1",[paymentId]);
+    }
+   }
+
+   await client.query("UPDATE webhook_events SET processed_at=now() WHERE id=$1",[deliveryId]);
+   return "applied";
+  });
+
+  return NextResponse.json({received:true,outcome});
+ }catch(error){
+  console.error("whop_webhook_processing_failed",error);
+  return NextResponse.json({error:"processing failed"},{status:500});
+ }
 }
