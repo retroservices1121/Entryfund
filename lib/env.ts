@@ -5,9 +5,9 @@ export const env={
  appUrl:optional("NEXT_PUBLIC_APP_URL")??"http://localhost:3000",
  databaseUrl:optional("DATABASE_URL"),
  authSecret:optional("AUTH_SECRET"),
- whopApiKey:optional("WHOP_API_KEY"),
+ whopApiKey:optional("WHOP_COMPANY_API_KEY")??optional("WHOP_API_KEY"),
  whopWebhookSecret:optional("WHOP_WEBHOOK_SECRET"),
- whopCompanyId:optional("WHOP_COMPANY_ID"),
+ whopCompanyId:optional("WHOP_COMPANY_ID"),\n whopSandbox:optional("WHOP_SANDBOX")==="true",
 };
 
 export function assertFinancialConfig(){
