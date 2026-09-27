@@ -1,45 +1,66 @@
-/**
- * Whop integration boundary.
- *
- * Keep provider-specific logic here so the product can evolve without
- * spreading financial infrastructure details throughout the UI.
- *
- * Live endpoints/SDK calls will be wired after platform credentials are added.
- */
+import { WhopClient } from "@whop/sdk";
+import { env } from "./env";
 
-export type ConnectedAccountStatus = "unverified" | "pending" | "verified";
+let cached:WhopClient|undefined;
 
-export type WhopAccount = {
-  id: string;
-  status: ConnectedAccountStatus;
-  balanceCents: number;
-};
-
-export type VirtualCard = {
-  id: string;
-  last4: string;
-  status: "active" | "frozen" | "closed";
-};
-
-export async function createConnectedAccount(): Promise<WhopAccount> {
-  throw new Error("Whop credentials not configured");
+export function whop(){
+ if(cached)return cached;
+ if(!env.whopApiKey)throw new Error("WHOP_API_KEY is not configured");
+ cached=new WhopClient({token:env.whopApiKey});
+ return cached;
 }
 
-export async function createCheckoutForEvent(_input: {
-  eventId: string;
-  amountCents: number;
-  successUrl: string;
-}): Promise<{ checkoutUrl: string }> {
-  throw new Error("Whop credentials not configured");
+export async function createConnectedCompany(input:{email:string;title:string;internalOrganizerId:string}){
+ if(!env.whopCompanyId)throw new Error("WHOP_COMPANY_ID is not configured");
+ return whop().companies.create({
+  email:input.email,
+  parent_company_id:env.whopCompanyId,
+  title:input.title,
+  send_customer_emails:false,
+  metadata:{entryfund_organizer_id:input.internalOrganizerId},
+ });
 }
 
-export async function issueVirtualCard(_accountId: string): Promise<VirtualCard> {
-  throw new Error("Whop credentials not configured");
+export async function createOrganizerOnboardingLink(input:{companyId:string;returnUrl:string;refreshUrl:string}){
+ const link=await whop().accountLinks.create({
+  company_id:input.companyId,
+  use_case:"account_onboarding",
+  return_url:input.returnUrl,
+  refresh_url:input.refreshUrl,
+ });
+ return link.url;
 }
 
-export async function requestWithdrawal(_input: {
-  accountId: string;
-  amountCents: number;
-}): Promise<{ id: string; status: string }> {
-  throw new Error("Whop credentials not configured");
+export async function createRegistrationCheckout(input:{
+ connectedCompanyId:string;
+ registrationId:string;
+ collectionId:string;
+ organizerId:string;
+ collectionName:string;
+ amountCents:number;
+ redirectUrl:string;
+}){
+ const checkout=await whop().checkoutConfigurations.create({
+  redirect_url:input.redirectUrl,
+  plan:{
+   company_id:input.connectedCompanyId,
+   currency:"usd",
+   initial_price:input.amountCents/100,
+   plan_type:"one_time",
+   application_fee_amount:0,
+   title:input.collectionName,
+  },
+  metadata:{
+   kind:"entryfund_registration",
+   registration_id:input.registrationId,
+   collection_id:input.collectionId,
+   organizer_id:input.organizerId,
+  },
+ });
+ if(!checkout?.id||!checkout.purchase_url)throw new Error("Whop checkout did not return a session");
+ return {sessionId:checkout.id,purchaseUrl:checkout.purchase_url,planId:checkout.plan?.id??null};
+}
+
+export async function retrievePayment(paymentId:string){
+ return whop().payments.retrieve(paymentId);
 }
