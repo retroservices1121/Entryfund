@@ -5,8 +5,16 @@ let cached:Whop|undefined;
 
 export function whop(){
  if(cached)return cached;
- if(!env.whopApiKey)throw new Error("WHOP_API_KEY is not configured");
- cached=new Whop({\n  apiKey:env.whopApiKey,\n  baseURL:env.whopSandbox?"https://sandbox-api.whop.com/api/v1":"https://api.whop.com/api/v1",\n  ...(env.whopWebhookSecret?{webhookKey:Buffer.from(env.whopWebhookSecret).toString("base64")}:{})\n });
+ if(!env.whopApiKey)throw new Error("WHOP_COMPANY_API_KEY is not configured");
+ cached=new Whop({
+  apiKey:env.whopApiKey,
+  baseURL:env.whopSandbox
+   ?"https://sandbox-api.whop.com/api/v1"
+   :"https://api.whop.com/api/v1",
+  ...(env.whopWebhookSecret
+   ?{webhookKey:Buffer.from(env.whopWebhookSecret).toString("base64")}
+   :{}),
+ });
  return cached;
 }
 
@@ -58,7 +66,7 @@ export async function createRegistrationCheckout(input:{
   },
  });
  if(!checkout?.id||!checkout.purchase_url)throw new Error("Whop checkout did not return a session");
- return {sessionId:checkout.id,purchaseUrl:checkout.purchase_url,planId:checkout.plan?.id??null};
+ return {sessionId:checkout.id,purchaseUrl:checkout.purchase_url};
 }
 
 export async function retrievePayment(paymentId:string){
