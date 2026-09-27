@@ -1,8 +1,7 @@
 import { NextRequest,NextResponse } from "next/server";
 import { query } from "@/lib/db";
 import { cleanText,email as validateEmail,ValidationError } from "@/lib/validation";
-import { createConnectedCompany,createOrganizerOnboardingLink } from "@/lib/whop";
-import { env } from "@/lib/env";
+import { createConnectedCompany } from "@/lib/whop";
 
 export async function POST(request:NextRequest){
  try{
@@ -27,14 +26,7 @@ export async function POST(request:NextRequest){
    organizer=updated.rows[0];
   }
 
-  const returnUrl=`${env.appUrl}/dashboard?organizer=${encodeURIComponent(organizer.id)}`;
-  const onboardingUrl=await createOrganizerOnboardingLink({
-   companyId:organizer.whop_account_id,
-   returnUrl,
-   refreshUrl:`${env.appUrl}/onboarding`,
-  });
-
-  return NextResponse.json({organizer,onboardingUrl},{status:201});
+  return NextResponse.json({organizer},{status:201});
  }catch(error){
   if(error instanceof ValidationError)return NextResponse.json({error:error.message},{status:400});
   console.error("organizer_bootstrap_failed",error);
