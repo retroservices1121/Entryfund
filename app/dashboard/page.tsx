@@ -1,78 +1,33 @@
 import Link from "next/link";
-import { events, organizer, transactions } from "@/lib/mock";
+import { query } from "@/lib/db";
 
-const money = (n: number) => n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+const money=(cents:number)=>Number(cents).toLocaleString("en-US",{style:"currency",currency:"USD",minimumFractionDigits:2});
+export const dynamic="force-dynamic";
 
-export default function Dashboard() {
-  return (
-    <div className="app">
-      <aside className="sidebar">
-        <div className="sidebrand">EntryFund</div>
-        <nav className="sidenav">
-          <Link className="active" href="/dashboard">Overview</Link>
-          <Link href="/events/new">Collections</Link>
-          <Link href="/card">Card</Link>
-          <Link href="/transactions">Transactions</Link>
-          <Link href="/payouts">Winner payouts</Link>
-          <Link href="/refunds">Refunds</Link>
-          <Link href="/withdrawals">Withdrawals</Link>
-        <Link href="/settings">Settings</Link></nav>
-      </aside>
-
-      <main className="main">
-        <div className="topbar">
-          <div><div className="muted small">Organizer</div><h1>{organizer.name}</h1></div>
-          <Link className="btn btn-blue" href="/events/new">+ Create collection</Link>
-        </div>
-
-        <section className="cards">
-          <div className="stat"><div className="muted small">Total balance</div><div className="value">{money(organizer.balance)}</div></div>
-          <div className="stat"><div className="muted small">Available</div><div className="value">{money(organizer.available)}</div></div>
-          <div className="stat"><div className="muted small">Card spend</div><div className="value">{money(organizer.spent)}</div></div>
-          <div className="stat"><div className="muted small">Withdrawn</div><div className="value">{money(organizer.withdrawn)}</div></div>
-        </section>
-
-        <div className="dashboard-grid">
-          <section className="table-card">
-            <div className="card-head"><strong>Collections</strong><Link className="small" href="/events/new">New collection</Link></div>
-            {events.map((event) => (
-              <Link className="table-row" href={"/dashboard/events/" + event.slug} key={event.slug}>
-                <div><strong>{event.name}</strong><div className="muted small">{event.date}</div></div>
-                <div><strong>{event.paid}/{event.capacity}</strong><div className="muted small">paid</div></div>
-                <div><strong>{money(event.collected)}</strong><div className="muted small">collected</div></div>
-                <div><span className="pill">{event.status}</span></div>
-              </Link>
-            ))}
-          </section>
-
-          <section className="card-box">
-            <div className="card-head"><strong>Whop Card</strong><span className="pill">Active</span></div>
-            <div className="virtual-card">
-              <div className="row"><img className="whop-logo" src="/whop-mark.svg" alt="Whop"/><span>VISA <small>Platinum</small></span></div>
-              <div>
-                <div className="digits">•••• •••• •••• 1847</div>
-                <div className="row small" style={{marginTop:12}}><span>EntryFund</span><span>•••• 1847</span></div>
-              </div>
-            </div>
-            <div style={{padding:"0 20px 20px"}} className="row">
-              <div><div className="muted small">Spendable balance</div><strong>{money(organizer.available)}</strong></div>
-              <button className="btn btn-soft">Manage</button>
-            </div>
-          </section>
-        </div>
-
-        <section className="card-box" style={{marginTop:18}}>
-          <div className="card-head"><strong>Recent activity</strong><a className="small" href="#">View all</a></div>
-          <div className="activity">
-            {transactions.map((tx, i) => (
-              <div className="activity-row" key={i}>
-                <div><strong>{tx.merchant}</strong><div className="muted small">{tx.meta} · {tx.date}</div></div>
-                <strong>{tx.amount > 0 ? "+" : ""}{money(tx.amount)}</strong>
-              </div>
-            ))}
-          </div>
-        </section>
-      </main>
-    </div>
-  );
+export default async function Dashboard({searchParams}:{searchParams:Promise<{organizer?:string}>}){
+ const {organizer:organizerId}=await searchParams;
+ let organizer:any=null;let collections:any[]=[];let totals={collected:0,spent:0,withdrawn:0};
+ if(organizerId){
+  const [org,cols,revenue,expenses,withdrawals]=await Promise.all([
+   query("SELECT * FROM organizers WHERE id=$1 LIMIT 1",[organizerId]),
+   query("SELECT c.*,COALESCE((SELECT COUNT(*) FROM registrations r WHERE r.collection_id=c.id AND r.status='completed'),0)::int AS paid,COALESCE((SELECT SUM(amount_cents) FROM registrations r WHERE r.collection_id=c.id AND r.status='completed'),0)::bigint AS collected FROM collections c WHERE c.organizer_id=$1 ORDER BY c.event_date DESC NULLS LAST",[organizerId]),
+   query("SELECT COALESCE(SUM(r.amount_cents),0)::bigint AS total FROM registrations r JOIN collections c ON c.id=r.collection_id WHERE c.organizer_id=$1 AND r.status='completed'",[organizerId]),
+   query("SELECT COALESCE(SUM(amount_cents),0)::bigint AS total FROM expenses WHERE organizer_id=$1 AND status='completed'",[organizerId]),
+   query("SELECT COALESCE(SUM(amount_cents+fee_cents),0)::bigint AS total FROM withdrawals WHERE organizer_id=$1 AND status='completed'",[organizerId])
+  ]);
+  organizer=org.rows[0]??null;collections=cols.rows;
+  totals={collected:Number(revenue.rows[0]?.total||0),spent:Number(expenses.rows[0]?.total||0),withdrawn:Number(withdrawals.rows[0]?.total||0)};
+ }
+ const available=totals.collected-totals.spent-totals.withdrawn;
+ return <div className="app">
+  <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav"><Link className="active" href={organizerId?"/dashboard?organizer="+organizerId:"/dashboard"}>Overview</Link><Link href="/events/new">Collections</Link><Link href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link><Link href="/settings">Settings</Link></nav></aside>
+  <main className="main">
+   {!organizer?<div className="form-card" style={{maxWidth:650}}><div className="eyebrow">Organizer account</div><h1>Connect your workspace</h1><p className="muted">Open EntryFund through your organizer account to load live PostgreSQL data.</p><Link className="btn btn-blue" href="/onboarding">Create / open organizer</Link></div>:<>
+   <div className="topbar"><div><div className="muted small">Organizer</div><h1>{organizer.name}</h1></div><Link className="btn btn-blue" href="/events/new">+ Create collection</Link></div>
+   <section className="cards"><div className="stat"><div className="muted small">Collected</div><div className="value">{money(totals.collected/100)}</div></div><div className="stat"><div className="muted small">Available</div><div className="value">{money(available/100)}</div></div><div className="stat"><div className="muted small">Card spend</div><div className="value">{money(totals.spent/100)}</div></div><div className="stat"><div className="muted small">Withdrawn</div><div className="value">{money(totals.withdrawn/100)}</div></div></section>
+   <section className="table-card"><div className="card-head"><strong>Collections</strong><Link className="small" href="/events/new">New collection</Link></div>
+    {collections.length===0?<div style={{padding:24}} className="muted">No collections yet. Create your first one.</div>:collections.map(c=><Link className="table-row" href={"/dashboard/events/"+c.slug+"?organizer="+organizerId} key={c.id}><div><strong>{c.name}</strong><div className="muted small">{c.event_date?new Date(c.event_date).toLocaleDateString():"No date"}</div></div><div><strong>{c.paid}/{c.capacity}</strong><div className="muted small">paid</div></div><div><strong>{money(Number(c.collected)/100)}</strong><div className="muted small">collected</div></div><div><span className="pill">{c.status}</span></div></Link>)}
+   </section></>}
+  </main>
+ </div>
 }
