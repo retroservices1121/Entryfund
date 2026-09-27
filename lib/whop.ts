@@ -1,4 +1,4 @@
-import Whop from "@whop/sdk";
+import { Whop } from "@whop/sdk";
 import { env } from "./env";
 
 let cached:Whop|undefined;
