@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { whop } from "@/lib/whop";
+import { Webhook } from "standardwebhooks";
 import { env } from "@/lib/env";
 import { transaction } from "@/lib/db";
 
@@ -18,7 +18,7 @@ export async function POST(request:Request){
 
  let event:WhopEvent;
  try{
-  event=whop().webhooks.unwrap(raw,{headers}) as unknown as WhopEvent;
+  const verifier=new Webhook(env.whopWebhookSecret,{format:"raw"});\n  event=verifier.verify(raw,headers) as WhopEvent;
  }catch(error){
   console.error("whop_webhook_signature_failed",error);
   return NextResponse.json({error:"bad signature"},{status:401});
