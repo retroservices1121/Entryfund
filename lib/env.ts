@@ -7,9 +7,14 @@ export const env={
  authSecret:optional("AUTH_SECRET"),
  whopApiKey:optional("WHOP_COMPANY_API_KEY")??optional("WHOP_API_KEY"),
  whopWebhookSecret:optional("WHOP_WEBHOOK_SECRET"),
- whopCompanyId:optional("WHOP_COMPANY_ID"),\n whopSandbox:optional("WHOP_SANDBOX")==="true",
+ whopCompanyId:optional("WHOP_COMPANY_ID"),
+ whopSandbox:optional("WHOP_SANDBOX")==="true",
 };
 
 export function assertFinancialConfig(){
- return {apiKey:required("WHOP_API_KEY"),webhookSecret:required("WHOP_WEBHOOK_SECRET"),companyId:required("WHOP_COMPANY_ID")};
+ return {
+  apiKey:required("WHOP_COMPANY_API_KEY"),
+  webhookSecret:required("WHOP_WEBHOOK_SECRET"),
+  companyId:required("WHOP_COMPANY_ID"),
+ };
 }
