@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS registrations (
  participant_name text NOT NULL,
  email text NOT NULL,
  phone text,
+ metadata jsonb NOT NULL DEFAULT '{}'::jsonb,
  amount_cents bigint NOT NULL CHECK(amount_cents>0),
  status text NOT NULL CHECK(status IN ('pending','available','completed','failed','refunded')),
  provider_payment_id text UNIQUE,
@@ -125,3 +126,5 @@ CREATE INDEX IF NOT EXISTS awards_collection_idx ON awards(collection_id);
 CREATE INDEX IF NOT EXISTS audit_organizer_created_idx ON audit_log(organizer_id,created_at DESC);
 
 ALTER TABLE registrations ADD COLUMN IF NOT EXISTS provider_checkout_id text UNIQUE;
+
+ALTER TABLE registrations ADD COLUMN IF NOT EXISTS metadata jsonb NOT NULL DEFAULT '{}'::jsonb;
