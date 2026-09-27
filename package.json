@@ -17,7 +17,8 @@
     "react-dom": "19.1.1",
     "lucide-react": "^0.468.0",
     "pg": "^8.13.1",
-    "@whop/sdk": "^0.0.42"
+    "@whop/sdk": "^1.0.0",
+    "zod": "^4.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
