@@ -1,12 +1,11 @@
 import { Whop } from "@whop/sdk";
 import { env } from "./env";
 
-let cached:Whop|undefined;
+let cached:ReturnType<typeof createClient>|undefined;
 
-export function whop(){
- if(cached)return cached;
+function createClient(){
  if(!env.whopApiKey)throw new Error("WHOP_COMPANY_API_KEY is not configured");
- cached=new Whop({
+ return new Whop({
   apiKey:env.whopApiKey,
   baseURL:env.whopSandbox
    ?"https://sandbox-api.whop.com/api/v1"
@@ -15,6 +14,11 @@ export function whop(){
    ?{webhookKey:Buffer.from(env.whopWebhookSecret).toString("base64")}
    :{}),
  });
+}
+
+export function whop(){
+ if(cached)return cached;
+ cached=createClient();
  return cached;
 }
 
