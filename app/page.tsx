@@ -27,7 +27,7 @@ export default function Home(){
       <div className="trustline"><span>NO BRACKETS</span><span>NO SCHEDULING</span><span>NO TEAM CHAT</span><strong>JUST THE MONEY.</strong></div>
      </div>
      <div className="hero-visual">
-      <div className="sport-photo" role="img" aria-label="Competitive cornhole tournament">
+      <div className="sport-photo" role="img" aria-label="Cornhole, flag football, and pickleball players">
        <div className="photo-shade"/>
        <div className="live-chip"><span className="live-dot"/> LIVE COLLECTION</div>
        <div className="float-balance">
