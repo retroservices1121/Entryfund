@@ -4,7 +4,6 @@ function required(name:string){const value=optional(name);if(!value)throw new Er
 export const env={
  appUrl:optional("NEXT_PUBLIC_APP_URL")??"http://localhost:3000",
  databaseUrl:optional("DATABASE_URL"),
- authSecret:optional("AUTH_SECRET"),
  whopApiKey:optional("WHOP_COMPANY_API_KEY")??optional("WHOP_API_KEY"),
  whopWebhookSecret:optional("WHOP_WEBHOOK_SECRET"),
  whopCompanyId:optional("WHOP_COMPANY_ID"),

@@ -76,7 +76,7 @@ startup behavior, the pinned Whop SDK contract, and remaining production limits.
 
 The UI and domain boundaries are intentionally provider-ready, but live money movement must not be simulated.
 
-1. Validate invitations and account sign-in against the deployed PostgreSQL database
+1. Add email verification and signup abuse controls before broad promotion
 2. Run a complete Whop sandbox checkout and webhook test
 3. Confirm connected-account verification status in the organizer workspace
 4. Retrieve real organizer balances and replace demonstration finance screens

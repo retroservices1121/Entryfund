@@ -25,12 +25,6 @@ export async function verifyPassword(password:string,stored:string){
  return timingSafeEqual(actual,Buffer.from(parts[2],"hex"));
 }
 
-export function matchesInvitation(value:string){
- const expected=process.env.AUTH_SECRET?.trim();
- if(!expected||expected.length<32||!value)return false;
- return timingSafeEqual(createHash("sha256").update(value).digest(),createHash("sha256").update(expected).digest());
-}
-
 export function makeSessionToken(){return randomBytes(32).toString("base64url")}
 
 export function setSessionCookie(token:string){
