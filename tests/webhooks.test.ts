@@ -49,7 +49,16 @@ test("webhook verification, deduplication, and transaction failures",async(t)=>{
  assert.equal((await POST(signed(event))).status,500);
  assert.equal(statements.at(-1)?.sql,"ROLLBACK");
  fail=false;statements.length=0;
+ assert.equal((await POST(signed({id:"msg_territory",type:"payment.succeeded",data:{id:"pay_territory",checkout_configuration_id:"ch_territory",account_id:"biz_child",total:{amount:"500.00",currency:"usd"},metadata:{kind:"entryfund_territory_fee",territory_fee_id:"fee_test"}}},{id:"msg_territory"}))).status,200);
+ assert.deepEqual(statements.find(s=>s.sql.includes("UPDATE territory_fees")&&s.sql.includes("status='paid'"))?.values,["pay_territory","fee_test","ch_territory","biz_child",50000]);
+ statements.length=0;
+ assert.equal((await POST(signed({id:"msg_territory_incomplete",type:"payment.succeeded",data:{id:"pay_other",metadata:{kind:"entryfund_territory_fee",territory_fee_id:"fee_test"}}},{id:"msg_territory_incomplete"}))).status,500);
+ assert.equal(statements.at(-1)?.sql,"ROLLBACK");
+ statements.length=0;
  assert.equal((await POST(signed({id:"msg_refund",type:"refund.updated",data:{payment_id:"pay_test",status:"succeeded"}},{id:"msg_refund"}))).status,200);
  assert.ok(statements.some(s=>s.sql.includes("status='refunded'")));
- assert.equal(releases,4);
+ statements.length=0;
+ assert.equal((await POST(signed({id:"msg_territory_refund",type:"refund.updated",data:{payment_id:"pay_territory",status:"succeeded"}},{id:"msg_territory_refund"}))).status,200);
+ assert.deepEqual(statements.find(s=>s.sql.includes("status='refund_review'"))?.values,["pay_territory"]);
+ assert.equal(releases,7);
 });

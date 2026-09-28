@@ -47,6 +47,8 @@ The product financial loop is:
 - `/onboarding` organizer setup
 - `/login` organizer sign-in
 - `/dashboard` financial overview
+- `/dashboard/territories` create and track one-time territory fees
+- `/pay/territory/[id]` territory payment link
 - `/events/new` create collection
 - `/events/[slug]` public registration
 - `/dashboard/events/[slug]` collection finances
@@ -85,6 +87,12 @@ The UI and domain boundaries are intentionally provider-ready, but live money mo
 7. Execute approved competitive payouts and track status
 8. Execute withdrawals and apply the final pricing policy
 9. Add dispute/chargeback handling, observability and production tests
+
+Territory fees are separate from player registrations. A league owner records a
+territory name, operator email, and one-time amount, then shares that territory's
+payment link. Whop limits its checkout plan to one purchase; a verified payment
+webhook marks the fee paid. EntryFund does not grant or manage territory rights,
+renewals, contracts, or operator accounts. Refund events flag a fee for review.
 
 ## Product boundary
 

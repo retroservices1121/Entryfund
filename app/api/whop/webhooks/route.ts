@@ -17,6 +17,14 @@ function metadataOf(data:Record<string,unknown>){
   :{};
 }
 
+function paidUsdCents(value:unknown){
+ if(!value||typeof value!=="object")return null;
+ const money=value as Record<string,unknown>;
+ if(money.currency!=="usd"||typeof money.amount!=="string"||!/^\d{1,7}(?:\.\d{1,2})?$/.test(money.amount))return null;
+ const [dollars,cents=""]=money.amount.split(".");
+ return Number(dollars)*100+Number(cents.padEnd(2,"0"));
+}
+
 export async function POST(request:Request){
  if(!env.whopWebhookSecret){
   return NextResponse.json({error:"Webhook secret is not configured"},{status:500});
@@ -55,14 +63,13 @@ export async function POST(request:Request){
 
    if(event.type==="payment.succeeded"||event.type==="payment.failed"){
     const metadata=metadataOf(event.data);
+    const paymentId=typeof event.data.id==="string"?event.data.id:null;
     const registrationId=
      typeof metadata.registration_id==="string"
       ?metadata.registration_id
       :null;
 
     if(metadata.kind==="entryfund_registration"&&registrationId){
-     const paymentId=typeof event.data.id==="string"?event.data.id:null;
-
      if(event.type==="payment.succeeded"){
       await client.query(
        `UPDATE registrations
@@ -77,6 +84,23 @@ export async function POST(request:Request){
        "UPDATE registrations SET status='failed' WHERE id=$1 AND status='pending'",
        [registrationId]
       );
+     }
+    }
+    const territoryFeeId=typeof metadata.territory_fee_id==="string"?metadata.territory_fee_id:null;
+    if(metadata.kind==="entryfund_territory_fee"&&territoryFeeId&&event.type==="payment.succeeded"){
+     const checkoutId=event.data.checkout_configuration_id;
+     const accountId=event.data.account_id;
+     const paidCents=paidUsdCents(event.data.total);
+     if(!paymentId||typeof checkoutId!=="string"||typeof accountId!=="string"||paidCents===null)throw new Error("Incomplete territory payment event");
+     const updated=await client.query(
+      `UPDATE territory_fees f SET status='paid',provider_payment_id=$1,paid_at=now(),updated_at=now()
+       FROM organizers o WHERE f.id=$2 AND f.organizer_id=o.id AND f.status='open'
+       AND f.provider_checkout_id=$3 AND o.whop_account_id=$4 AND f.amount_cents<=$5`,
+      [paymentId,territoryFeeId,checkoutId,accountId,paidCents],
+     );
+     if(updated.rowCount===0){
+      const existing=await client.query<{provider_payment_id:string|null}>("SELECT provider_payment_id FROM territory_fees WHERE id=$1",[territoryFeeId]);
+      if(existing.rows[0]?.provider_payment_id!==paymentId)throw new Error("Territory payment does not match its checkout, account, or amount");
      }
     }
    }
@@ -94,6 +118,10 @@ export async function POST(request:Request){
     if(paymentId&&status==="succeeded"){
      await client.query(
       "UPDATE registrations SET status='refunded' WHERE provider_payment_id=$1",
+      [paymentId]
+     );
+     await client.query(
+      "UPDATE territory_fees SET status='refund_review',updated_at=now() WHERE provider_payment_id=$1 AND status='paid'",
       [paymentId]
      );
     }

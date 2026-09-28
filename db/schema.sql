@@ -57,6 +57,22 @@ CREATE TABLE IF NOT EXISTS collections (
  UNIQUE(organizer_id,slug)
 );
 
+CREATE TABLE IF NOT EXISTS territory_fees (
+ id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+ organizer_id uuid NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
+ territory_name text NOT NULL,
+ operator_email text NOT NULL,
+ amount_cents bigint NOT NULL CHECK(amount_cents>0),
+ status text NOT NULL DEFAULT 'open' CHECK(status IN ('open','paid','refund_review')),
+ provider_checkout_id text UNIQUE,
+ checkout_url text,
+ provider_payment_id text UNIQUE,
+ paid_at timestamptz,
+ created_at timestamptz NOT NULL DEFAULT now(),
+ updated_at timestamptz NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS territory_fees_organizer_idx ON territory_fees(organizer_id,created_at DESC);
+
 CREATE TABLE IF NOT EXISTS registrations (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  collection_id uuid NOT NULL REFERENCES collections(id) ON DELETE RESTRICT,

@@ -19,8 +19,8 @@ export async function POST(request:Request,{params}:{params:Promise<{id:string}>
  try{
   const url=await createOrganizerOnboardingLink({
    companyId:organizer.whop_account_id,
-   returnUrl:`${env.appUrl}/dashboard?organizer=${encodeURIComponent(id)}&activated=1`,
-   refreshUrl:`${env.appUrl}/dashboard?organizer=${encodeURIComponent(id)}`,
+   returnUrl:`${env.appUrl}/settings?setup=returned`,
+   refreshUrl:`${env.appUrl}/settings`,
   });
   await query("UPDATE organizers SET verification_status='pending',updated_at=now() WHERE id=$1",[id]);
   return NextResponse.json({url});
