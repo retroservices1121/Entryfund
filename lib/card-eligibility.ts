@@ -5,8 +5,9 @@ export function cardRequestPhase(input:{
  hasAccountOwner:boolean;
  existingCards:number;
  applicationStatus:string|null;
+ cardIssuingStatus:string|null;
 }){
  if(input.role!=="owner"||!input.hasAccount||!input.hasBalanceAccess||!input.hasAccountOwner||input.existingCards>0)return null;
  if(input.applicationStatus===null)return "application";
- return input.applicationStatus==="approved"?"issue":null;
+ return input.applicationStatus==="approved"&&input.cardIssuingStatus==="active"?"issue":null;
 }

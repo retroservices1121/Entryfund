@@ -15,15 +15,32 @@ export default async function CardPage(){
  let wallet:Awaited<ReturnType<typeof getOrganizerWallet>>|null=null;
  let cards:Array<{id:string;status:string|null;name:string|null;last4:string|null;type:string|null;spent_last_month:number|null}>|null=null;
  if(accountId){
-  try{
-   wallet=await getOrganizerWallet(accountId);
-   cards=(await whop().cards.list({account_id:accountId})).data;
-  }catch(error){console.error("organizer_card_read_failed",{organizerId:session.organizerId,error})}
+  try{wallet=await getOrganizerWallet(accountId)}
+  catch(error){console.error("organizer_card_account_read_failed",{organizerId:session.organizerId,error})}
+  if(wallet){
+   try{cards=(await whop().cards.list({account_id:accountId})).data}
+   catch(error){
+    console.error("organizer_card_list_failed",{organizerId:session.organizerId,error});
+    // Whop may block listing cards while the application is not approved.
+    if(wallet.cards?.status!=="approved")cards=[];
+   }
+  }
  }
  const shownCards=cards??[];
  const requestPhase=cards&&cardRequestPhase({role:session.role,hasAccount:Boolean(accountId),
   hasBalanceAccess:Boolean(wallet?.capabilities),hasAccountOwner:Boolean(wallet?.ownerId),
-  existingCards:cards.length,applicationStatus:wallet?.cards?.status??null});
+  existingCards:cards.length,applicationStatus:wallet?.cards?.status??null,
+  cardIssuingStatus:wallet?.capabilities?.card_issuing??null});
+ const applicationStatus=wallet?.cards?.status??null;
+ const statusMessage=applicationStatus==="needs_verification"||applicationStatus==="needs_information"
+  ?"Whop needs identity information for this card application. Open Whop financial setup in Settings to finish or correct it."
+  :applicationStatus==="pending"||applicationStatus==="manual_review"
+  ?"Whop is reviewing this account's card application. Refresh this page after Whop updates it."
+  :applicationStatus==="denied"||applicationStatus==="locked"||applicationStatus==="canceled"
+  ?"Whop cannot issue a card for this account in its current state. Contact Whop support for the reason and next step."
+  :applicationStatus==="approved"&&wallet?.capabilities?.card_issuing!=="active"
+  ?"The card application is approved, but Whop has not enabled card issuing for this account yet."
+  :null;
  return <div className="app">
   <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav">
    <Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link className="active" href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link><Link href="/settings">Settings</Link>
@@ -32,7 +49,7 @@ export default async function CardPage(){
    <div className="topbar"><div><div className="muted small">Organizer spending</div><h1>Whop cards</h1></div><Link className="btn btn-soft" href="/dashboard">Back to overview</Link></div>
    <section className="cards" style={{gridTemplateColumns:"repeat(2,1fr)"}}>
     <div className="stat"><div className="muted small">Whop available (USD)</div><div className="value">{wallet?.balance?formatUsd(wallet.balance.available):"Unavailable"}</div></div>
-    <div className="stat"><div className="muted small">Card application</div><div className="value" style={{fontSize:22}}>{wallet?wallet.cards?.status?.replaceAll("_"," ")??"Not started":"Unavailable"}</div></div>
+    <div className="stat"><div className="muted small">Card application</div><div className="value" style={{fontSize:22}}>{wallet?applicationStatus?.replaceAll("_"," ")??"Not started":"Unavailable"}</div><div className="muted small">Card issuing: {wallet?.capabilities?.card_issuing??"Unavailable"}</div>{wallet?.verification.individual&&<div className="muted small">Personal verification: {wallet.verification.individual.replaceAll("_"," ")}</div>}{wallet?.verification.business&&<div className="muted small">Business verification: {wallet.verification.business.replaceAll("_"," ")}</div>}</div>
    </section>
    <section className="table-card">
     <div className="card-head"><div><strong>Issued cards</strong><div className="muted small">Cards and status reported by Whop. Full card details stay in Whop.</div></div></div>
@@ -41,9 +58,11 @@ export default async function CardPage(){
      <span className="pill">{card.status||"Pending"}</span>
     </div>):<div style={{padding:20}} className="muted">{cards?"No card has been issued for this organizer.":"Card details are unavailable. Check Whop access or complete financial setup."}</div>}
    </section>
-   {requestPhase?<section className="form-card" style={{marginTop:20}}><h2 style={{marginTop:0}}>{requestPhase==="issue"?"Issue a virtual card":"Apply for Whop Cards"}</h2><p className="muted">Whop manages eligibility and issues the card to the account owner. The application may require identity or business verification.</p><CardAction/></section>
+   {requestPhase?<section className="form-card" style={{marginTop:20}}><h2 style={{marginTop:0}}>{requestPhase==="issue"?"Issue a virtual card":"Start card application"}</h2><p className="muted">{requestPhase==="issue"?"Whop has approved card issuing for this account. The card will be assigned to its Whop account owner.":"Whop requires a separate card application for this connected account. Your completed payout verification may help, but Whop still reviews card eligibility."}</p><CardAction phase={requestPhase}/></section>
     :!accountId?<p className="muted">Connect the organizer's Whop account in <Link href="/settings">Settings</Link> to begin card setup.</p>
-    :wallet?.cards&&wallet.cards.status!=="approved"?<p className="muted">Whop card application status: {wallet.cards.status.replaceAll("_"," ")}. Continue verification in <Link href="/settings">Settings</Link> if action is needed.</p>
+    :statusMessage?<p className="muted">{statusMessage} {(applicationStatus==="needs_verification"||applicationStatus==="needs_information")&&<Link href="/settings">Open Settings</Link>}</p>
+    :!wallet?.capabilities?<p className="muted">Card eligibility is unavailable. The Whop API key needs account and balance read access.</p>
+    :session.role!=="owner"?<p className="muted">The organizer owner can start card setup from this page.</p>
     :null}
   </main>
  </div>;
