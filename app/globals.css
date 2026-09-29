@@ -17,3 +17,12 @@
 .whop-logo{display:block;width:34px;height:24px;object-fit:contain;object-position:left center;color:#777;opacity:.78}
 .float-card .whop-logo{width:30px;height:22px}
 .micro-card .whop-logo{width:24px;height:18px;filter:invert(1);opacity:1}
+
+/* Keep organizer navigation visible on phones and tablets. */
+@media(max-width:900px){
+ .app{display:block}
+ .sidebar{display:block;position:static;height:auto;padding:12px 14px}
+ .sidebrand{margin:0 0 8px;font-size:18px}
+ .sidenav{display:flex;flex-wrap:wrap;gap:4px}
+ .sidenav a{padding:8px 10px;font-size:13px;white-space:nowrap}
+}

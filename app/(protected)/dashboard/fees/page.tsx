@@ -11,7 +11,7 @@ export default async function OneTimeFeesPage(){
  const session=await requirePageSession();
  const fees=await query<Fee>("SELECT id,title,contact_email,amount_cents,status,created_at FROM one_time_fees WHERE organizer_id=$1 ORDER BY created_at DESC",[session.organizerId]);
  return <div className="app">
-  <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav"><Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link className="active" href="/dashboard/fees">One-time fees</Link><Link href="/settings">Settings</Link></nav></aside>
+  <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav"><Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link className="active" href="/dashboard/fees">One-time fees</Link><Link href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link><Link href="/settings">Settings</Link></nav></aside>
   <main className="main">
    <div className="topbar"><div><div className="muted small">Payment links</div><h1>One-time fees</h1></div><Link className="btn btn-soft" href="/dashboard">Back to dashboard</Link></div>
    <div className="dashboard-grid">
