@@ -29,7 +29,7 @@ export default function Home(){
      <div className="hero-visual">
       <div className="sport-photo" role="img" aria-label="Cornhole, flag football, and pickleball players">
        <div className="photo-shade"/>
-       <div className="live-chip"><span className="live-dot"/> LIVE COLLECTION</div>
+       <div className="live-chip"><span className="live-dot"/> PRODUCT PREVIEW</div>
        <div className="float-balance">
         <div className="float-label">Virginia Beach Open</div>
         <div className="float-amount">$18,420.00</div>
@@ -74,8 +74,8 @@ export default function Home(){
      </div>
     </div>
     <div className="ledger-demo">
-     <div className="ledger-head"><span>EVENT FINANCIALS</span><span className="pill-dark">LIVE</span></div>
-     <div className="ledger-title"><div><small>Virginia Beach Open</small><strong>$18,420.00</strong></div><span>Available balance</span></div>
+     <div className="ledger-head"><span>EVENT FINANCIALS</span><span className="pill-dark">EXAMPLE</span></div>
+     <div className="ledger-title"><div><small>Virginia Beach Open</small><strong>$18,420.00</strong></div><span>Illustrative balance</span></div>
      <div className="ledger-row"><span>Registrations</span><b className="positive">+$18,420.00</b></div>
      <div className="ledger-row"><span>Venue</span><b>−$2,750.00</b></div>
      <div className="ledger-row"><span>Marketing</span><b>−$840.00</b></div>
