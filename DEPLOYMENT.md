@@ -67,7 +67,18 @@ accepts metadata from checkout sessions created before the migration.
 The organizer can start or resume Whop financial setup from `/settings`; that
 screen shows the organizer's actual account details instead of sample verification
 claims. One-time fee payment confirmation checks the Whop checkout ID, connected
-account, USD amount, and signed webhook before marking a fee paid.
+account, USD amount, and signed webhook; the return page can also reconcile a
+paid Whop payment when webhook delivery is delayed.
+
+The dashboard reads the connected Whop account's USD available, pending, and
+reserve holdings. If balance access is absent or the account has no USD holding,
+it says "Unavailable" rather than calculating a provider balance from sales.
+The card page lists Whop-issued cards and their status. The organizer owner can
+start a card application, or issue one card after approval, through Whop. This
+requires the account and API key to have balance/card permissions. The action
+uses an idempotency key and will not create another card when one already exists.
+Card transactions are read from Whop on the Transactions page; payouts, refunds,
+and withdrawals are currently read-only EntryFund records.
 
 ## Whop contract
 
@@ -107,7 +118,7 @@ The first stabilization commit covered installation, SDK requests, webhook handl
 and deployment configuration. The following access-control pass added sign-in,
 sessions, and organizer ownership checks. Public signup does not verify email
 ownership; existing accounts cannot be claimed by matching their email. The
-remaining demonstration finance screens have not been replaced.
+organizer finance screens no longer display demonstration figures.
 Partial refund accounting remains limited by the existing registration-level
 refunded status. Reconcile these flows before live money movement.
 

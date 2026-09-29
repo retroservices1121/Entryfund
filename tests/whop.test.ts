@@ -19,12 +19,20 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
   const checkout=await api.createRegistrationCheckout({connectedCompanyId:"biz_child",registrationId:"reg_test",collectionId:"collection_test",organizerId:"org_test",collectionName:"Entry",amountCents:1234,redirectUrl:"https://example.com/return"});
   const feeCheckout=await api.createOneTimeFeeCheckout({connectedCompanyId:"biz_child",feeId:"fee_test",title:"League dues",amountCents:50000,redirectUrl:"https://example.com/fee-return"});
   await api.retrievePayment("pay_test");
+  await api.whop().accounts.retrieve({id:"biz_child"});
+  await api.whop().cards.list({account_id:"biz_child"});
+  await api.whop().cards.create({account_id:"biz_child",assigned_user_id:"user_owner",name:"Organizer card"},{idempotencyKey:"card-request-test"});
+  await api.whop().cardTransactions.list({account_id:"biz_child",first:50});
   assert.deepEqual(requests.map(r=>r.url),[
    "https://sandbox-api.whop.com/api/v1/accounts",
    "https://sandbox-api.whop.com/api/v1/account_links",
    "https://sandbox-api.whop.com/api/v1/checkout_configurations",
    "https://sandbox-api.whop.com/api/v1/checkout_configurations",
    "https://sandbox-api.whop.com/api/v1/payments/pay_test",
+   "https://sandbox-api.whop.com/api/v1/accounts/biz_child",
+   "https://sandbox-api.whop.com/api/v1/cards?account_id=biz_child",
+   "https://sandbox-api.whop.com/api/v1/cards",
+   "https://sandbox-api.whop.com/api/v1/card_transactions?account_id=biz_child&first=50",
   ]);
   for(const request of requests){
    assert.equal(request.headers.get("authorization"),"Bearer test_key");
@@ -46,6 +54,9 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
   assert.equal(requests[3].body.plan.stock,1);
   assert.equal(requests[3].body.plan.unlimited_stock,false);
   assert.equal(requests[3].body.plan.force_create_new_plan,true);
+  assert.equal(requests[7].body.account_id,"biz_child");
+  assert.equal(requests[7].body.assigned_user_id,"user_owner");
+  assert.equal(requests[7].headers.get("idempotency-key"),"card-request-test");
   assert.ok(requests[0].headers.get("idempotency-key"));
   assert.ok(requests[2].headers.get("idempotency-key"));
   assert.notEqual(requests[0].headers.get("idempotency-key"),requests[2].headers.get("idempotency-key"));

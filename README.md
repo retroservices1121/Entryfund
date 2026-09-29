@@ -19,11 +19,10 @@ The product financial loop is:
 - Public player registration page
 - Organizer financial dashboard
 - Collection/event financial detail and P&L
-- Virtual-card workspace
-- Unified transaction ledger
-- Competitive award / payout ledger
-- Refund tracking
-- Withdrawal history
+- Whop account balance display (available, pending, and reserve USD)
+- Whop card listing and owner-initiated card application/issuance
+- Recorded payments and Whop card transaction activity
+- Read-only award, refund, and withdrawal records
 - Organizer settings
 - Shared financial domain model and ledger calculations
 - Whop provider integration boundary
@@ -82,12 +81,19 @@ The UI and domain boundaries are intentionally provider-ready, but live money mo
 1. Add email verification and signup abuse controls before broad promotion
 2. Run a complete Whop checkout and webhook test in sandbox or with a controlled live payment
 3. Confirm connected-account verification status in the organizer workspace
-4. Retrieve real organizer balances and replace demonstration finance screens
-5. Issue/manage real virtual cards
-6. Execute and reconcile full and partial refunds
-7. Execute approved competitive payouts and track status
-8. Execute withdrawals and apply the final pricing policy
-9. Add dispute/chargeback handling, observability and production tests
+4. Confirm balance and card API permissions for connected organizers in production
+5. Complete Whop card application and issuance with an eligible organizer
+6. Reconcile card transactions into collection expenses and add freeze/limit controls
+7. Execute and reconcile full and partial refunds
+8. Execute approved competitive payouts and track status
+9. Execute withdrawals and apply the final pricing policy
+10. Add dispute/chargeback handling, observability and production tests
+
+Organizer finance screens now show records and Whop data instead of sample figures.
+The card action is available only to the organizer owner. Whop decides whether an
+account can apply for or receive a card; EntryFund does not issue cards itself or
+show full card numbers. Payouts, refunds, and withdrawals remain read-only until
+their provider operations are integrated.
 
 One-time fees are separate from player registrations. An organizer records a fee
 name, optional contact email, and amount, then shares the payment link. The
