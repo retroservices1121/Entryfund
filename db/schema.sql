@@ -57,11 +57,27 @@ CREATE TABLE IF NOT EXISTS collections (
  UNIQUE(organizer_id,slug)
 );
 
-CREATE TABLE IF NOT EXISTS territory_fees (
+DO $$
+BEGIN
+ IF to_regclass('territory_fees') IS NOT NULL AND to_regclass('one_time_fees') IS NULL THEN
+  ALTER TABLE territory_fees RENAME TO one_time_fees;
+ END IF;
+ IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='one_time_fees' AND column_name='territory_name') THEN
+  ALTER TABLE one_time_fees RENAME COLUMN territory_name TO title;
+ END IF;
+ IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema=current_schema() AND table_name='one_time_fees' AND column_name='operator_email') THEN
+  ALTER TABLE one_time_fees RENAME COLUMN operator_email TO contact_email;
+ END IF;
+ IF to_regclass('territory_fees_organizer_idx') IS NOT NULL AND to_regclass('one_time_fees_organizer_idx') IS NULL THEN
+  ALTER INDEX territory_fees_organizer_idx RENAME TO one_time_fees_organizer_idx;
+ END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS one_time_fees (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
  organizer_id uuid NOT NULL REFERENCES organizers(id) ON DELETE CASCADE,
- territory_name text NOT NULL,
- operator_email text NOT NULL,
+ title text NOT NULL,
+ contact_email text,
  amount_cents bigint NOT NULL CHECK(amount_cents>0),
  status text NOT NULL DEFAULT 'open' CHECK(status IN ('open','paid','refund_review')),
  provider_checkout_id text UNIQUE,
@@ -71,7 +87,8 @@ CREATE TABLE IF NOT EXISTS territory_fees (
  created_at timestamptz NOT NULL DEFAULT now(),
  updated_at timestamptz NOT NULL DEFAULT now()
 );
-CREATE INDEX IF NOT EXISTS territory_fees_organizer_idx ON territory_fees(organizer_id,created_at DESC);
+ALTER TABLE one_time_fees ALTER COLUMN contact_email DROP NOT NULL;
+CREATE INDEX IF NOT EXISTS one_time_fees_organizer_idx ON one_time_fees(organizer_id,created_at DESC);
 
 CREATE TABLE IF NOT EXISTS registrations (
  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

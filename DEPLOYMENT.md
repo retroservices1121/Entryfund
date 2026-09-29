@@ -55,16 +55,18 @@ existing organizers or collections. Public signup currently has no email verific
 or automated abuse controls. Add those before broad promotion; the Whop account
 verification flow remains separate.
 
-League owners can create multiple one-time territory fees at `/dashboard/territories`.
-Each fee has a territory name, operator contact email, amount, and public payment
-link. The link is not emailed automatically. The Whop checkout uses a dedicated
-one-time plan with stock 1. Signed payment webhooks mark the fee paid; refund
-events mark it for review because partial refunds need reconciliation. The
-operator email is a contact reference, not an identity check or ownership grant.
-Territory rights, contracts, and renewals are outside this payment flow.
+Organizers can create multiple one-time fees at `/dashboard/fees`. Each fee has
+a name, optional contact email, amount, and public payment link. The link is not
+emailed automatically, and the contact email does not restrict who can pay. The
+Whop checkout uses a dedicated one-time plan with stock 1. Signed payment
+webhooks mark the fee paid; refund events mark it for review because partial
+refunds need reconciliation. Existing territory fee records and payment links
+are migrated to the generic fee model without changing their IDs. Old
+`/pay/territory/[id]` links redirect to `/pay/fee/[id]`, and the webhook still
+accepts metadata from checkout sessions created before the migration.
 The organizer can start or resume Whop financial setup from `/settings`; that
 screen shows the organizer's actual account details instead of sample verification
-claims. Territory payment confirmation checks the Whop checkout ID, connected
+claims. One-time fee payment confirmation checks the Whop checkout ID, connected
 account, USD amount, and signed webhook before marking a fee paid.
 
 ## Whop contract

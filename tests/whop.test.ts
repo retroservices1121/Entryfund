@@ -17,7 +17,7 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
   await api.createConnectedCompany({email:"test@example.com",title:"Organizer",internalOrganizerId:"org_test"});
   await api.createOrganizerOnboardingLink({companyId:"biz_child",returnUrl:"https://example.com/return",refreshUrl:"https://example.com/refresh"});
   const checkout=await api.createRegistrationCheckout({connectedCompanyId:"biz_child",registrationId:"reg_test",collectionId:"collection_test",organizerId:"org_test",collectionName:"Entry",amountCents:1234,redirectUrl:"https://example.com/return"});
-  const territoryCheckout=await api.createTerritoryFeeCheckout({connectedCompanyId:"biz_child",territoryFeeId:"fee_test",territoryName:"Virginia Beach",amountCents:50000,redirectUrl:"https://example.com/territory-return"});
+  const feeCheckout=await api.createOneTimeFeeCheckout({connectedCompanyId:"biz_child",feeId:"fee_test",title:"League dues",amountCents:50000,redirectUrl:"https://example.com/fee-return"});
   await api.retrievePayment("pay_test");
   assert.deepEqual(requests.map(r=>r.url),[
    "https://sandbox-api.whop.com/api/v1/accounts",
@@ -39,8 +39,9 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
   assert.equal(requests[2].body.plan.initial_price,12.34);
   assert.equal(requests[2].body.plan.application_fee_amount,undefined);
   assert.equal(requests[2].body.metadata.registration_id,"reg_test");
-  assert.equal(requests[3].body.metadata.kind,"entryfund_territory_fee");
-  assert.equal(requests[3].body.metadata.territory_fee_id,"fee_test");
+  assert.equal(requests[3].body.metadata.kind,"entryfund_one_time_fee");
+  assert.equal(requests[3].body.metadata.one_time_fee_id,"fee_test");
+  assert.equal(requests[3].body.plan.title,"League dues");
   assert.equal(requests[3].body.plan.plan_type,"one_time");
   assert.equal(requests[3].body.plan.stock,1);
   assert.equal(requests[3].body.plan.unlimited_stock,false);
@@ -49,6 +50,6 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
   assert.ok(requests[2].headers.get("idempotency-key"));
   assert.notEqual(requests[0].headers.get("idempotency-key"),requests[2].headers.get("idempotency-key"));
   assert.equal(checkout.sessionId,"ch_test");
-  assert.equal(territoryCheckout.sessionId,"ch_test");
+  assert.equal(feeCheckout.sessionId,"ch_test");
  }finally{globalThis.fetch=original}
 });

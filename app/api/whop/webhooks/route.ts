@@ -86,21 +86,25 @@ export async function POST(request:Request){
       );
      }
     }
-    const territoryFeeId=typeof metadata.territory_fee_id==="string"?metadata.territory_fee_id:null;
-    if(metadata.kind==="entryfund_territory_fee"&&territoryFeeId&&event.type==="payment.succeeded"){
+    const feeId=metadata.kind==="entryfund_one_time_fee"&&typeof metadata.one_time_fee_id==="string"
+     ?metadata.one_time_fee_id
+     :metadata.kind==="entryfund_territory_fee"&&typeof metadata.territory_fee_id==="string"
+      ?metadata.territory_fee_id
+      :null;
+    if(feeId&&event.type==="payment.succeeded"){
      const checkoutId=event.data.checkout_configuration_id;
      const accountId=event.data.account_id;
      const paidCents=paidUsdCents(event.data.total);
-     if(!paymentId||typeof checkoutId!=="string"||typeof accountId!=="string"||paidCents===null)throw new Error("Incomplete territory payment event");
+     if(!paymentId||typeof checkoutId!=="string"||typeof accountId!=="string"||paidCents===null)throw new Error("Incomplete one-time fee payment event");
      const updated=await client.query(
-      `UPDATE territory_fees f SET status='paid',provider_payment_id=$1,paid_at=now(),updated_at=now()
+      `UPDATE one_time_fees f SET status='paid',provider_payment_id=$1,paid_at=now(),updated_at=now()
        FROM organizers o WHERE f.id=$2 AND f.organizer_id=o.id AND f.status='open'
        AND f.provider_checkout_id=$3 AND o.whop_account_id=$4 AND f.amount_cents<=$5`,
-      [paymentId,territoryFeeId,checkoutId,accountId,paidCents],
+      [paymentId,feeId,checkoutId,accountId,paidCents],
      );
      if(updated.rowCount===0){
-      const existing=await client.query<{provider_payment_id:string|null}>("SELECT provider_payment_id FROM territory_fees WHERE id=$1",[territoryFeeId]);
-      if(existing.rows[0]?.provider_payment_id!==paymentId)throw new Error("Territory payment does not match its checkout, account, or amount");
+      const existing=await client.query<{provider_payment_id:string|null}>("SELECT provider_payment_id FROM one_time_fees WHERE id=$1",[feeId]);
+      if(existing.rows[0]?.provider_payment_id!==paymentId)throw new Error("One-time fee payment does not match its checkout, account, or amount");
      }
     }
    }
@@ -121,7 +125,7 @@ export async function POST(request:Request){
       [paymentId]
      );
      await client.query(
-      "UPDATE territory_fees SET status='refund_review',updated_at=now() WHERE provider_payment_id=$1 AND status='paid'",
+      "UPDATE one_time_fees SET status='refund_review',updated_at=now() WHERE provider_payment_id=$1 AND status='paid'",
       [paymentId]
      );
     }

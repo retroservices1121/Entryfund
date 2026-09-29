@@ -71,10 +71,10 @@ export async function createRegistrationCheckout(input:{
  return {sessionId:checkout.id,purchaseUrl:checkout.purchase_url};
 }
 
-export async function createTerritoryFeeCheckout(input:{
+export async function createOneTimeFeeCheckout(input:{
  connectedCompanyId:string;
- territoryFeeId:string;
- territoryName:string;
+ feeId:string;
+ title:string;
  amountCents:number;
  redirectUrl:string;
 }){
@@ -86,13 +86,13 @@ export async function createTerritoryFeeCheckout(input:{
    currency:"usd",
    initial_price:input.amountCents/100,
    plan_type:"one_time",
-   title:`Territory fee: ${input.territoryName}`.slice(0,30),
+   title:input.title.slice(0,30),
    force_create_new_plan:true,
    stock:1,
    unlimited_stock:false,
   },
-  metadata:{kind:"entryfund_territory_fee",territory_fee_id:input.territoryFeeId},
- },{idempotencyKey:idempotencyKey(["territory-fee",input.territoryFeeId])});
+  metadata:{kind:"entryfund_one_time_fee",one_time_fee_id:input.feeId},
+ },{idempotencyKey:idempotencyKey(["one-time-fee",input.feeId])});
  if(!checkout?.id||!checkout.purchase_url)throw new Error("Whop checkout did not return a session");
  return {sessionId:checkout.id,purchaseUrl:checkout.purchase_url};
 }

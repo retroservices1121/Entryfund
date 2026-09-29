@@ -11,7 +11,7 @@ export default async function SettingsPage(){
  const result=await query<{name:string;email:string}>("SELECT name,email FROM organizers WHERE id=$1",[session.organizerId]);
  const organizer=result.rows[0];if(!organizer)notFound();
  return <div className="app">
-  <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav"><Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link href="/dashboard/territories">Territory fees</Link><Link href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link><Link className="active" href="/settings">Settings</Link></nav></aside>
+  <aside className="sidebar"><div className="sidebrand">EntryFund</div><nav className="sidenav"><Link href="/dashboard">Overview</Link><Link href="/events/new">Collections</Link><Link href="/dashboard/fees">One-time fees</Link><Link href="/card">Card</Link><Link href="/transactions">Transactions</Link><Link href="/payouts">Winner payouts</Link><Link href="/refunds">Refunds</Link><Link href="/withdrawals">Withdrawals</Link><Link className="active" href="/settings">Settings</Link></nav></aside>
   <main className="main">
    <div className="topbar"><div><div className="muted small">{organizer.name}</div><h1>Account & financial setup</h1></div></div>
    <div className="dashboard-grid">

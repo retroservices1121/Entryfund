@@ -15,6 +15,7 @@ The product financial loop is:
 - High-impact sports + fintech landing experience
 - Organizer onboarding and verification state UX
 - Create registration / financial collection
+- Create a one-time fee and share its single-use payment link
 - Public player registration page
 - Organizer financial dashboard
 - Collection/event financial detail and P&L
@@ -47,8 +48,8 @@ The product financial loop is:
 - `/onboarding` organizer setup
 - `/login` organizer sign-in
 - `/dashboard` financial overview
-- `/dashboard/territories` create and track one-time territory fees
-- `/pay/territory/[id]` territory payment link
+- `/dashboard/fees` create and track one-time fees
+- `/pay/fee/[id]` one-time fee payment link
 - `/events/new` create collection
 - `/events/[slug]` public registration
 - `/dashboard/events/[slug]` collection finances
@@ -79,7 +80,7 @@ startup behavior, the pinned Whop SDK contract, and remaining production limits.
 The UI and domain boundaries are intentionally provider-ready, but live money movement must not be simulated.
 
 1. Add email verification and signup abuse controls before broad promotion
-2. Run a complete Whop sandbox checkout and webhook test
+2. Run a complete Whop checkout and webhook test in sandbox or with a controlled live payment
 3. Confirm connected-account verification status in the organizer workspace
 4. Retrieve real organizer balances and replace demonstration finance screens
 5. Issue/manage real virtual cards
@@ -88,11 +89,11 @@ The UI and domain boundaries are intentionally provider-ready, but live money mo
 8. Execute withdrawals and apply the final pricing policy
 9. Add dispute/chargeback handling, observability and production tests
 
-Territory fees are separate from player registrations. A league owner records a
-territory name, operator email, and one-time amount, then shares that territory's
-payment link. Whop limits its checkout plan to one purchase; a verified payment
-webhook marks the fee paid. EntryFund does not grant or manage territory rights,
-renewals, contracts, or operator accounts. Refund events flag a fee for review.
+One-time fees are separate from player registrations. An organizer records a fee
+name, optional contact email, and amount, then shares the payment link. The
+contact email is for the organizer's records; it does not restrict who can pay.
+Whop limits the checkout plan to one purchase, and a verified payment webhook
+marks the fee paid. Refund events flag a fee for review.
 
 ## Product boundary
 

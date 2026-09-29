@@ -50,6 +50,8 @@ test("organizer IDs and cross-site mutation origins cannot grant access",()=>{
  assert.equal(ownsOrganizer(session,"organizer_b"),false);
  assert.equal(ownsOrganizer(null,"organizer_a"),false);
  assert.equal(sameOrigin(new Request("https://entryfund.example/api/collections",{headers:{origin:"https://entryfund.example"}})),true);
+ assert.equal(sameOrigin(new Request("http://internal:3000/api/collections",{headers:{origin:"https://entryfund.example",host:"entryfund.example"}})),true);
+ assert.equal(sameOrigin(new Request("http://internal:3000/api/collections",{headers:{origin:"https://attacker.example",host:"entryfund.example"}})),false);
  assert.equal(sameOrigin(new Request("https://entryfund.example/api/collections",{headers:{origin:"https://attacker.example"}})),false);
  assert.equal(sameOrigin(new Request("https://entryfund.example/api/collections")),false);
 });
