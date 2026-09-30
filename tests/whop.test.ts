@@ -24,6 +24,7 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
   await api.whop().cards.create({account_id:"biz_child",assigned_user_id:"user_owner",name:"Organizer card"},{idempotencyKey:"card-request-test"});
   await api.whop().cardTransactions.list({account_id:"biz_child",first:50});
   await api.whop().cards.retrieve({id:"icrd_test",account_id:"biz_child"});
+  await api.createOrganizerVerification("biz_child","individual");
   assert.deepEqual(requests.map(r=>r.url),[
    "https://sandbox-api.whop.com/api/v1/accounts",
    "https://sandbox-api.whop.com/api/v1/account_links",
@@ -35,6 +36,7 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
    "https://sandbox-api.whop.com/api/v1/cards",
    "https://sandbox-api.whop.com/api/v1/card_transactions?account_id=biz_child&first=50",
    "https://sandbox-api.whop.com/api/v1/cards/icrd_test?account_id=biz_child",
+   "https://sandbox-api.whop.com/api/v1/verifications?account_id=biz_child",
   ]);
   for(const request of requests){
    assert.equal(request.headers.get("authorization"),"Bearer test_key");
@@ -59,6 +61,7 @@ test("Whop operations send the pinned API's URLs, headers, and request bodies",a
   assert.equal(requests[7].body.account_id,"biz_child");
   assert.equal(requests[7].body.assigned_user_id,"user_owner");
   assert.equal(requests[7].headers.get("idempotency-key"),"card-request-test");
+  assert.equal(requests[10].body.kind,"individual");
   assert.ok(requests[0].headers.get("idempotency-key"));
   assert.ok(requests[2].headers.get("idempotency-key"));
   assert.notEqual(requests[0].headers.get("idempotency-key"),requests[2].headers.get("idempotency-key"));

@@ -41,6 +41,10 @@ export async function createOrganizerOnboardingLink(input:{companyId:string;retu
  return link.url;
 }
 
+export async function createOrganizerVerification(accountId:string,kind:"individual"|"business"){
+ return whop().verifications.create({account_id:accountId,body:{kind}});
+}
+
 export async function createRegistrationCheckout(input:{
  connectedCompanyId:string;
  registrationId:string;
