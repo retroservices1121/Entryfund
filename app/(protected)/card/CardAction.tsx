@@ -13,7 +13,7 @@ export default function CardAction({phase}:{phase:"application"|"issue"}){
   try{
    const response=await fetch("/api/cards",{method:"POST"});
    const body=await response.json();
-   if(!response.ok){setError(body.error||"Whop could not start card setup.");return}
+   if(!response.ok){setError(`${body.error||"Whop could not start card setup."}${body.requestId?` (Whop request ${body.requestId})`:""}`);return}
    if(body.object==="card_application")setMessage("Your card application was submitted to Whop. Refresh this page for its status.");
    else if(body.object==="card")setMessage("Your virtual card was issued. Its status will appear below.");
    else setMessage("Whop received the request. Refresh this page for its status.");
