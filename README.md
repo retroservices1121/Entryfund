@@ -20,7 +20,7 @@ The product financial loop is:
 - Organizer financial dashboard
 - Collection/event financial detail and P&L
 - Whop account balance display (available, pending, and reserve USD)
-- Whop card listing and owner-initiated card application/issuance
+- Whop card listing, owner-initiated card application/issuance, and temporary owner-only card details
 - Recorded payments and Whop card transaction activity
 - Read-only award, refund, and withdrawal records
 - Organizer settings
@@ -91,8 +91,9 @@ The UI and domain boundaries are intentionally provider-ready, but live money mo
 
 Organizer finance screens now show records and Whop data instead of sample figures.
 The card action is available only to the organizer owner. Whop decides whether an
-account can apply for or receive a card; EntryFund does not issue cards itself or
-show full card numbers. Payouts, refunds, and withdrawals remain read-only until
+account can apply for or receive a card; EntryFund does not issue cards itself.
+An organizer owner can reveal an active card through Whop for 30 seconds; card
+numbers and CVCs are never persisted in EntryFund. Payouts, refunds, and withdrawals remain read-only until
 their provider operations are integrated.
 
 One-time fees are separate from player registrations. An organizer records a fee

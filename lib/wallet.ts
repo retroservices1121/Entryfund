@@ -24,5 +24,6 @@ export async function getOrganizerWallet(accountId:string){
  const account=await whop().accounts.retrieve({id:accountId});
  if(account.id!==accountId)throw new Error("Whop account mismatch");
  return {balance:usdBalance(account.balances),cards:account.cards,capabilities:account.capabilities,ownerId:account.owner?.id,
+  country:account.country,
   verification:{individual:verificationStatus(account.verification?.individual),business:verificationStatus(account.verification?.business)}};
 }

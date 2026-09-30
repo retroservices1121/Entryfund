@@ -4,6 +4,7 @@ import { query } from "@/lib/db";
 import { whop } from "@/lib/whop";
 import { formatUsd, getOrganizerWallet } from "@/lib/wallet";
 import CardAction from "./CardAction";
+import CardDetails from "./CardDetails";
 import { cardRequestPhase } from "@/lib/card-eligibility";
 
 export const dynamic="force-dynamic";
@@ -49,13 +50,13 @@ export default async function CardPage(){
    <div className="topbar"><div><div className="muted small">Organizer spending</div><h1>Whop cards</h1></div><Link className="btn btn-soft" href="/dashboard">Back to overview</Link></div>
    <section className="cards" style={{gridTemplateColumns:"repeat(2,1fr)"}}>
     <div className="stat"><div className="muted small">Whop available (USD)</div><div className="value">{wallet?.balance?formatUsd(wallet.balance.available):"Unavailable"}</div></div>
-    <div className="stat"><div className="muted small">Card application</div><div className="value" style={{fontSize:22}}>{wallet?applicationStatus?.replaceAll("_"," ")??"Not started":"Unavailable"}</div><div className="muted small">Card issuing: {wallet?.capabilities?.card_issuing??"Unavailable"}</div>{wallet?.verification.individual&&<div className="muted small">Personal verification: {wallet.verification.individual.replaceAll("_"," ")}</div>}{wallet?.verification.business&&<div className="muted small">Business verification: {wallet.verification.business.replaceAll("_"," ")}</div>}</div>
+    <div className="stat"><div className="muted small">Card application</div><div className="value" style={{fontSize:22}}>{wallet?applicationStatus?.replaceAll("_"," ")??"Not started":"Unavailable"}</div><div className="muted small">Whop account country: {wallet?.country??"Unavailable"}</div><div className="muted small">Card issuing: {wallet?.capabilities?.card_issuing??"Unavailable"}</div>{wallet?.verification.individual&&<div className="muted small">Personal verification: {wallet.verification.individual.replaceAll("_"," ")}</div>}{wallet?.verification.business&&<div className="muted small">Business verification: {wallet.verification.business.replaceAll("_"," ")}</div>}</div>
    </section>
    <section className="table-card">
-    <div className="card-head"><div><strong>Issued cards</strong><div className="muted small">Cards and status reported by Whop. Full card details stay in Whop.</div></div></div>
+    <div className="card-head"><div><strong>Issued cards</strong><div className="muted small">Cards and status reported by Whop. Active card details are shown only to the organizer owner on request.</div></div></div>
     {shownCards.length>0?shownCards.map(card=><div className="activity-row" style={{padding:"18px 20px"}} key={card.id}>
      <div><strong>{card.name||"Whop virtual card"} {card.last4?`•••• ${card.last4}`:""}</strong><div className="muted small">{card.type||"Card"} · Last 30 days: {typeof card.spent_last_month==="number"?formatUsd(String(card.spent_last_month/100)):"Unavailable"}</div></div>
-     <span className="pill">{card.status||"Pending"}</span>
+     <div style={{display:"grid",gap:8,justifyItems:"end"}}><span className="pill">{card.status||"Pending"}</span>{session.role==="owner"&&card.status==="active"&&<CardDetails cardId={card.id} last4={card.last4}/>}</div>
     </div>):<div style={{padding:20}} className="muted">{cards?"No card has been issued for this organizer.":"Card details are unavailable. Check Whop access or complete financial setup."}</div>}
    </section>
    {requestPhase?<section className="form-card" style={{marginTop:20}}><h2 style={{marginTop:0}}>{requestPhase==="issue"?"Issue a virtual card":"Start card application"}</h2><p className="muted">{requestPhase==="issue"?"Whop has approved card issuing for this account. The card will be assigned to its Whop account owner.":"Whop requires a separate card application for this connected account. Your completed payout verification may help, but Whop still reviews card eligibility."}</p><CardAction phase={requestPhase}/></section>
