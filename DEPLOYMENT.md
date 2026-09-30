@@ -19,7 +19,7 @@ Remove dashboard build/start overrides if they conflict with this configuration.
 | --- | --- |
 | `DATABASE_URL` | Reference the Railway Postgres service's private connection URL. |
 | `NEXT_PUBLIC_APP_URL` | The complete public HTTPS application origin, without a trailing slash. |
-| `WHOP_COMPANY_API_KEY` | The platform's Account API key; `WHOP_API_KEY` remains an accepted alias. |
+| `WHOP_COMPANY_API_KEY` | The platform's live Company API key; `WHOP_API_KEY` remains an accepted alias. Keep its existing checkout, account, balance, and card permissions, and grant `identity:write` for hosted verification plus `identity:read` to read verification status. |
 | `WHOP_COMPANY_ID` | The platform account ID (`biz_...`). The key determines the parent of newly created connected accounts. |
 | `WHOP_WEBHOOK_SECRET` | Exact endpoint signing secret, including its `ws_` prefix. |
 | `WHOP_SANDBOX` | `true` for sandbox keys and webhooks; `false` for production. |
@@ -64,9 +64,13 @@ refunds need reconciliation. Existing territory fee records and payment links
 are migrated to the generic fee model without changing their IDs. Old
 `/pay/territory/[id]` links redirect to `/pay/fee/[id]`, and the webhook still
 accepts metadata from checkout sessions created before the migration.
-The organizer can start or resume Whop financial setup from `/settings`; that
-screen shows the organizer's actual account details instead of sample verification
-claims. One-time fee payment confirmation checks the Whop checkout ID, connected
+The organizer can start or resume Whop individual or business verification from
+`/settings`. The Company API key must have `identity:write`; without it Whop returns
+`Company API key is not authorized for the identity:write scope`. If the existing
+key cannot gain that permission, create a live replacement with all currently used
+permissions plus `identity:write` and `identity:read`, then replace
+`WHOP_COMPANY_API_KEY` in Railway. Do not replace it with an identity-only key.
+One-time fee payment confirmation checks the Whop checkout ID, connected
 account, USD amount, and signed webhook; the return page can also reconcile a
 paid Whop payment when webhook delivery is delayed.
 
@@ -103,6 +107,7 @@ Official references checked for this stabilization:
 - [Whop TypeScript SDK and generated source](https://github.com/whopio/whopsdk-typescript)
 - [Create Account](https://docs.whop.com/api-reference/beta/accounts/create-account)
 - [Account links](https://docs.whop.com/api-reference/account-links/create-account-link)
+- [Whop KYC API guide and required permissions](https://whop.com/blog/integrate-kyc-api/)
 - [Webhook verification](https://docs.whop.com/developer/guides/webhooks)
 - [Railpack Node configuration](https://railpack.com/languages/node)
 - [Railway healthchecks](https://docs.railway.com/deployments/healthchecks)
